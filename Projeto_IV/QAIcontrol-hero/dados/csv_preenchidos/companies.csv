@@ -1,0 +1,20 @@
+company_id,company_name,industry,company_size,employee_count,razao_social,cnpj,cep,endereco,cidade,estado,admin_responsavel
+C01,NexoCode Solucoes,Tecnologia / Desenvolvimento de Software,Media,363,NexoCode Solucoes Ltda.,10.223.255/0001-77,04571-000,"Av. Engenheiro Luís Carlos Berrini, 1500 - Cidade Monções",São Paulo,SP,Letícia Pereira Rocha
+C02,Vortice Software,Tecnologia / Desenvolvimento de Software,Pequena,120,Vortice Software Ltda.,84.970.833/0001-75,88010-070,"Rua Pedro Ivo, 231 - Centro",Florianópolis,SC,Fábio Freitas Gomes
+C03,Piloto Digital Sistemas,Tecnologia / Desenvolvimento de Software,Pequena,35,Piloto Digital Sistemas Ltda.,78.726.724/0001-04,05508-000,"Av. Professor Lineu Prestes, 2242 - Butantã",São Paulo,SP,Aline Almeida Pereira
+C04,Cronos Tech Labs,Tecnologia / Desenvolvimento de Software,Pequena,106,Cronos Tech Labs Ltda.,00.588.349/0001-96,30112-010,"Rua Antônio de Albuquerque, 330 - Savassi",Belo Horizonte,MG,Larissa Gonçalves Soares
+C05,ByteFlow Engenharia de Software,Tecnologia / Desenvolvimento de Software,Pequena,29,ByteFlow Engenharia de Software Ltda.,03.982.457/0001-37,50030-220,"Rua do Apolo, 181 - Recife Antigo",Recife,PE,Isabela Cardoso Moura
+C06,Banco Alterosa S.A.,Financeiro,Media,357,Banco Alterosa S.A.,13.175.422/0001-40,30130-005,"Av. Afonso Pena, 1500 - Centro",Belo Horizonte,MG,Marcelo Gomes Moura
+C07,Capital Sul Investimentos,Financeiro,Pequena,73,Capital Sul Investimentos Ltda.,04.652.005/0001-50,90480-000,"Av. Carlos Gomes, 700 - Boa Vista",Porto Alegre,RS,Patrícia Nascimento Ribeiro
+C08,Fincredi Solucoes Financeiras,Financeiro,Pequena,41,Fincredi Solucoes Financeiras Ltda.,33.413.602/0001-20,80060-000,"Rua XV de Novembro, 1200 - Centro",Curitiba,PR,Renata Carvalho Pinto
+C09,Metalurgica Vale Forte,Industria,Media,339,Metalurgica Vale Forte Ltda.,21.812.336/0001-29,32669-000,"Rodovia Fernão Dias, km 492 - Distrito Industrial",Betim,MG,Vanessa Araújo Pinto
+C10,Quimica Bandeirantes,Industria,Pequena,134,Quimica Bandeirantes Ltda.,45.266.490/0001-00,09080-510,"Av. Industrial, 1800 - Jardim",Santo André,SP,Henrique Costa Barros
+C11,TextilNorte Manufatura,Industria,Pequena,37,TextilNorte Manufatura Ltda.,80.554.774/0001-01,60015-180,"Rua Maestro Lisboa, 400 - Centro",Fortaleza,CE,Lucas Moura Ferreira
+C12,Compra Certa Varejo,Varejo,Media,272,Compra Certa Varejo Ltda.,12.207.891/0001-30,01310-200,"Av. Paulista, 2100 - Bela Vista",São Paulo,SP,Carla Santana Marques
+C13,Lojas Formosa,Varejo,Pequena,84,Lojas Formosa Ltda.,68.800.800/0001-20,74010-010,"Av. Goiás, 900 - Setor Central",Goiânia,GO,Isabela Vieira Nascimento
+C14,MercadoPrime E-commerce,Varejo,Pequena,125,MercadoPrime E-commerce Ltda.,85.489.573/0001-83,04533-012,"Rua Tabapuã, 627 - Itaim Bibi",São Paulo,SP,Eduardo Moreira Soares
+C15,Prisma Consultoria Empresarial,Servicos,Pequena,82,Prisma Consultoria Empresarial Ltda.,03.020.975/0001-70,20040-003,"Av. Rio Branco, 156 - Centro",Rio de Janeiro,RJ,Beatriz Marques Moura
+C16,ServPro Facilities,Servicos,Pequena,40,ServPro Facilities Ltda.,66.329.566/0001-70,41820-020,"Av. Tancredo Neves, 1632 - Caminho das Árvores",Salvador,BA,Fábio Machado Nascimento
+C17,Ideia Fresca Marketing,Marketing,Pequena,48,Ideia Fresca Marketing Ltda.,74.723.233/0001-59,05416-001,"Rua Fradique Coutinho, 1000 - Pinheiros",São Paulo,SP,Leonardo Dias Almeida
+C18,Estrela Marketing Digital,Marketing,Pequena,71,Estrela Marketing Digital Ltda.,54.866.233/0001-09,22410-002,"Rua Visconde de Pirajá, 550 - Ipanema",Rio de Janeiro,RJ,Mariana Soares Freitas
+C19,ESPM,Ensino Superior,Pequena,2,Associação Escola Superior de Propaganda e Marketing,61825675000164,04018010,Rua alavaro alvim 123,São  Paulo,SP,Pablo Perez Schmekel

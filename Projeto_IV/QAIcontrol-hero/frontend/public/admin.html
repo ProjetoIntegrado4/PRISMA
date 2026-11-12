@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QAIcontrol - Administradores</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="Estilo.css">
+<script src="./navbar.js" defer></script>
+</head>
+<body>
+  <nav class="top-nav" aria-label="Navegação principal">
+    <a href="./index.html">QAIcontrol · Início</a>
+</nav>
+
+  <h1>Cadastro de Administradores</h1>
+  <p>Associe cada administrador a uma empresa já cadastrada e acompanhe os registros existentes.</p>
+
+  <section>
+    <h2>Novo administrador</h2>
+    <div class="form-row">
+      <input id="nome" placeholder="Nome completo" aria-label="Nome completo" autocomplete="name" required>
+      <input id="cpf" type="text" placeholder="CPF (000.000.000-00)" aria-label="CPF" inputmode="numeric" maxlength="14" autocomplete="off" required>
+      <input id="email" type="email" placeholder="E-mail" aria-label="E-mail" autocomplete="email" required>
+      <input id="telefone" type="tel" placeholder="Telefone com DDD ((11) 99999-0000)" aria-label="Telefone com DDD" inputmode="numeric" maxlength="15" autocomplete="tel" required>
+      <select id="empresaId" aria-label="Empresa do administrador" required>
+        <option value="">Selecione uma empresa</option>
+      </select>
+      <input id="cargo" placeholder="Cargo" aria-label="Cargo" autocomplete="organization-title" required>
+      <input id="senha" type="password" placeholder="Senha" aria-label="Senha" autocomplete="new-password" required>
+      <input id="confirmacaoSenha" type="password" placeholder="Confirme a senha" aria-label="Confirme a senha" autocomplete="new-password" required>
+      <select id="statusConta" aria-label="Status da conta" required>
+        <option value="" disabled selected>Selecione o status</option>
+        <option value="ATIVO">Ativo</option>
+        <option value="INATIVO">Inativo</option>
+      </select>
+      <input id="nivelAcesso" placeholder="Nível de acesso" aria-label="Nível de acesso" required>
+      <button type="button" onclick="criarAdmin()">Cadastrar admin</button>
+    </div>
+    <div id="mensagem" class="message" aria-live="polite"></div>
+  </section>
+
+  <section class="info-box">
+    <h2>Vinculo com empresa</h2>
+    <p>O administrador depende de uma empresa existente e pode cadastrar funcionários vinculados a essa mesma empresa.</p>
+  </section>
+
+  <section>
+    <div class="section-heading">
+      <h2>Administradores cadastrados</h2>
+      <button type="button" class="secondary-button" onclick="carregarAdmins()">Atualizar lista</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>E-mail</th>
+            <th>Telefone</th>
+            <th>Empresa</th>
+            <th>Area</th>
+            <th>Cargo</th>
+            <th>Status</th>
+            <th>Nível de acesso</th>
+            <th>Código</th>
+          </tr>
+        </thead>
+        <tbody id="listaAdmins"></tbody>
+      </table>
+    </div>
+  </section>
+
+<script>
+const mensagem = document.getElementById('mensagem');
+const listaAdmins = document.getElementById('listaAdmins');
+const empresaSelect = document.getElementById('empresaId');
+
+async function lerResposta(response) {
+  const text = await response.text();
+  let body;
+  try { body = text ? JSON.parse(text) : {}; } catch { body = { raw: text }; }
+  if (!response.ok) throw new Error(body.message || body.error || `HTTP ${response.status}`);
+  return body;
+}
+
+async function carregarEmpresas() {
+  const empresas = await lerResposta(await fetch('/api/empresa'));
+
+  empresaSelect.innerHTML = '<option value="">Selecione uma empresa</option>';
+
+  if (!empresas.length) {
+    mensagem.textContent = 'Cadastre ao menos uma empresa antes de criar um administrador.';
+    return;
+  }
+
+  for (const empresa of empresas) {
+    const option = document.createElement('option');
+    option.value = empresa.id;
+    option.textContent = `${empresa.name} (${empresa.area})`;
+    empresaSelect.appendChild(option);
+  }
+}
+
+async function criarAdmin() {
+  try {
+    const nome = document.getElementById('nome').value.trim();
+    const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
+    const email = document.getElementById('email').value.trim();
+    const telefone = Number(document.getElementById('telefone').value.replace(/\D/g, ''));
+    const empresaId = empresaSelect.value;
+    const cargo = document.getElementById('cargo').value.trim();
+    const senha = document.getElementById('senha').value;
+    const confirmacaoSenha = document.getElementById('confirmacaoSenha').value;
+    const statusConta = document.getElementById('statusConta').value;
+    const nivelAcesso = document.getElementById('nivelAcesso').value.trim();
+
+    if (!nome || !cpf || !email || !Number.isSafeInteger(telefone) || telefone <= 0 || !empresaId || !cargo || !senha || !confirmacaoSenha || !statusConta || !nivelAcesso) {
+      throw new Error('Preencha todos os campos obrigatórios do administrador.');
+    }
+    if (cpf.length !== 11) {
+      throw new Error('O CPF precisa ter 11 dígitos.');
+    }
+    if (String(telefone).length < 10 || String(telefone).length > 11) {
+      throw new Error('O telefone precisa ter DDD e 10 ou 11 dígitos.');
+    }
+    if (senha !== confirmacaoSenha) {
+      throw new Error('A senha e a confirmação precisam ser iguais.');
+    }
+
+    const admin = await lerResposta(await fetch('/api/admin', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ nome, cpf, email, telefone, empresaId, cargo, senha, confirmacaoSenha, statusConta, nivelAcesso })
+    }));
+
+    mensagem.textContent = `Admin ${admin.nome} cadastrado com sucesso para a empresa ${admin.empresaNome}.`;
+    for (const id of ['nome', 'cpf', 'email', 'telefone', 'cargo', 'senha', 'confirmacaoSenha', 'nivelAcesso']) {
+      document.getElementById(id).value = '';
+    }
+    document.getElementById('statusConta').value = '';
+    await carregarAdmins();
+  } catch (e) {
+    mensagem.textContent = e.message;
+  }
+}
+
+async function carregarAdmins() {
+  try {
+    const admins = await lerResposta(await fetch('/api/admin'));
+    listaAdmins.innerHTML = '';
+
+    if (!admins.length) {
+      listaAdmins.innerHTML = '<tr><td colspan="10">Nenhum administrador cadastrado.</td></tr>';
+      return;
+    }
+
+    for (const admin of admins) {
+      const tr = document.createElement('tr');
+      const values = [admin.nome, admin.cpf, admin.email, admin.telefone, admin.empresaNome,
+        admin.empresaArea, admin.cargo, admin.statusConta, admin.nivelAcesso];
+      for (const value of values) {
+        const cell = document.createElement('td');
+        cell.textContent = value ?? '';
+        tr.appendChild(cell);
+      }
+      const idCell = document.createElement('td');
+      const code = document.createElement('code');
+      code.textContent = admin.codigo || admin.id;
+      idCell.appendChild(code);
+      tr.appendChild(idCell);
+      listaAdmins.appendChild(tr);
+    }
+  } catch (e) {
+    mensagem.textContent = e.message;
+  }
+}
+
+async function inicializarPagina() {
+  try {
+    await carregarEmpresas();
+    await carregarAdmins();
+  } catch (e) {
+    mensagem.textContent = e.message;
+  }
+}
+
+inicializarPagina();
+</script>
+<script src="./auth.js"></script>
+</body>
+</html>
