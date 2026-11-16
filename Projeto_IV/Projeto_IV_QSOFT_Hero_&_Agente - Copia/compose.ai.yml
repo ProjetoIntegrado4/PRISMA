@@ -1,0 +1,108 @@
+# Extend the existing application without changing its PostgreSQL volume or image.
+services:
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    environment:
+      OLLAMA_NO_CLOUD: "1"
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_CONTEXT_LENGTH: "4096"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks: [app_net]
+
+  backend:
+    environment:
+      AI_SERVICE_URL: http://ai-service:8000
+      AI_INTERNAL_TOKEN: ${AI_INTERNAL_TOKEN:?Defina AI_INTERNAL_TOKEN no arquivo .env}
+
+  ai-db:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: qai_ai
+      POSTGRES_USER: qai_ai
+      POSTGRES_PASSWORD: ${AI_DB_PASSWORD:?Defina AI_DB_PASSWORD no arquivo .env}
+    volumes:
+      - ai_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qai_ai -d qai_ai"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [app_net]
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: qai
+      RABBITMQ_DEFAULT_PASS: ${AI_RABBIT_PASSWORD:?Defina AI_RABBIT_PASSWORD no arquivo .env}
+    ports:
+      - "127.0.0.1:${AI_RABBIT_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - rabbit_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+    networks: [app_net]
+
+  ai-service:
+    image: qaicontrol-ai:local
+    build: ./ai-service
+    restart: unless-stopped
+    environment: &ai-env
+      AI_DATABASE_URL: postgresql://qai_ai:${AI_DB_PASSWORD}@ai-db:5432/qai_ai
+      RABBITMQ_URL: amqp://qai:${AI_RABBIT_PASSWORD}@rabbitmq:5672/%2F
+      AI_INTERNAL_TOKEN: ${AI_INTERNAL_TOKEN}
+      OLLAMA_URL: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5:1.5b}
+      QSOFT_DADOS_DIR: /data
+      TZ: America/Sao_Paulo
+    volumes: &ai-volumes
+      - type: bind
+        source: ${QSOFT_DADOS_DIR:-./dados/csv_preenchidos}
+        target: /data
+        read_only: true
+    depends_on:
+      ai-db: {condition: service_healthy}
+      rabbitmq: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,urllib.request; urllib.request.urlopen(urllib.request.Request('http://localhost:8000/health',headers={'X-Internal-Token':os.environ['AI_INTERNAL_TOKEN']}),timeout=5)"]
+      interval: 20s
+      timeout: 8s
+      retries: 5
+    networks: [app_net]
+
+  ml-worker:
+    image: qaicontrol-ai:local
+    build: ./ai-service
+    command: ["python", "worker.py"]
+    restart: unless-stopped
+    environment:
+      <<: *ai-env
+      AI_QUEUE: qai.training
+    volumes: *ai-volumes
+    depends_on:
+      ai-service: {condition: service_healthy}
+    networks: [app_net]
+
+  ragas-worker:
+    image: qaicontrol-ai:local
+    build: ./ai-service
+    command: ["python", "worker.py"]
+    restart: unless-stopped
+    environment:
+      <<: *ai-env
+      AI_QUEUE: qai.evaluation
+    depends_on:
+      ai-service: {condition: service_healthy}
+    networks: [app_net]
+
+volumes:
+  ollama_data:
+  ai_data:
+  rabbit_data:

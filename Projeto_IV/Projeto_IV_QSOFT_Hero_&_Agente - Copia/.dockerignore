@@ -1,0 +1,11 @@
+target
+.git
+.idea
+.vscode
+*.iml
+frontend-vue/node_modules
+.env
+.env.*
+**/node_modules
+**/__pycache__
+**/.pytest_cache
