@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class EmpresaDadosVOTest {
 
     private static EmpresaDadosVO completo() {
-        return new EmpresaDadosVO("Tecnologia", "QSoft Ltda", "12345678000199", 10,
+        return new EmpresaDadosVO("Tecnologia", "Prisma Ltda", "12345678000199", 10,
                 "01310-100", "Av. Paulista, 1000", "São Paulo", "SP", "Ana");
     }
 
@@ -28,7 +28,7 @@ class EmpresaDadosVOTest {
     @Test
     void deveCriarComTodosOsDados() {
         EmpresaDadosVO vo = completo();
-        assertEquals("QSoft Ltda", vo.razaoSocial());
+        assertEquals("Prisma Ltda", vo.razaoSocial());
         assertEquals("12345678000199", vo.cnpj());
         assertEquals(10, vo.numeroFuncionarios());
         assertEquals("01310-100", vo.cep());

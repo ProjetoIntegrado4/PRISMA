@@ -1,6 +1,6 @@
 spring:
   application:
-    name: qsoft-ia-backend
+    name: prisma-ia-backend
   config:
     import:
       - classpath:produtividade.yml
@@ -19,15 +19,15 @@ spring:
         format_sql: true
 
 # Base de dados dos cadastros de empresas, funcionários e admins (companies.csv, employees.csv,
-# departments.csv e admins.csv). O caminho vem só da variável QSOFT_DADOS_DIR, definida no arquivo .env
+# departments.csv e admins.csv). O caminho vem só da variável PRISMA_DADOS_DIR, definida no arquivo .env
 # da raiz do projeto; o painel de produtividade lê a mesma pasta.
-qsoft:
+prisma:
   dados:
-    dir: ${QSOFT_DADOS_DIR:dados/csv}
+    dir: ${PRISMA_DADOS_DIR:dados/csv}
   # Carga de demonstração (service/demonstracao/DemonstracaoSeeder): políticas, aceites e consumo de IA,
-  # derivados da base de dados. Só preenche tabela vazia. Desligue com QSOFT_DEMONSTRACAO=false.
+  # derivados da base de dados. Só preenche tabela vazia. Desligue com PRISMA_DEMONSTRACAO=false.
   demonstracao:
-    popular: ${QSOFT_DEMONSTRACAO:true}
+    popular: ${PRISMA_DEMONSTRACAO:true}
 
 services:
   alert:
@@ -35,9 +35,20 @@ services:
 
 app:
   auth:
-    username: ${TEMP_LOGIN_USERNAME:admin@qsoft.com}
-    password: ${TEMP_LOGIN_PASSWORD:Qsoft123!}
-    name: ${TEMP_LOGIN_NAME:Administrador QSOFT}
+    username: ${TEMP_LOGIN_USERNAME:admin@prisma.com}
+    password: ${TEMP_LOGIN_PASSWORD:Prisma123!}
+    name: ${TEMP_LOGIN_NAME:Administrador Prisma}
+    # Conta temporária com o perfil Gerente (igual ao admin, mas sem cadastrar empresa).
+    gerente:
+      username: ${TEMP_GERENTE_USERNAME:gerente@prisma.com}
+      password: ${TEMP_GERENTE_PASSWORD:Prisma123!}
+      name: ${TEMP_GERENTE_NAME:Gerente Prisma}
+    # Conta temporária com o perfil Funcionário (visão restrita). Admins e funcionários da base (admins.csv e
+    # employees.csv) também entram, com o e-mail e a senha deles.
+    funcionario:
+      username: ${TEMP_FUNCIONARIO_USERNAME:funcionario@prisma.com}
+      password: ${TEMP_FUNCIONARIO_PASSWORD:Prisma123!}
+      name: ${TEMP_FUNCIONARIO_NAME:Funcionário Prisma}
   # Pontos de AI Literacy por capacitação registrada (US PP-19). Usados em service/PontuacaoAiLiteracy.
   # PRELIMINAR – validar com o PO: o documento do projeto ainda não define esses pesos (RF10/RF11).
   ai-literacy:

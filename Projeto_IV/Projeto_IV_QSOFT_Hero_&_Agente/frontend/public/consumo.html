@@ -3,21 +3,36 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>QAIcontrol - Consumo de IA</title>
+    <title>Prisma - Consumo de IA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
     <link rel="stylesheet" href="Estilo.css">
+    <link rel="icon" type="image/png" href="img/favicon.png">
 </head>
 <body>
 <nav class="top-nav" aria-label="Navegação principal">
-    <a href="./index.html">Home</a>
-    <a href="./empresa.html">Empresas</a>
-    <a href="./admin.html">Admins</a>
-    <a href="./funcionario.html">Funcionarios</a>
-    <a href="./capacitacao.html">Capacitações</a>
-    <a class="active" href="./consumo.html">Consumo de IA</a>
-    <a href="./produtividade.html">Produtividade IA</a>
-    <a href="./custos.html">Custos de IA</a>
+    <a class="brand" href="./index.html" aria-label="Prisma, início">
+        <img class="brand-logo" src="img/prisma-logo.png" alt="" aria-hidden="true">
+        <span class="brand-name"><b>Prisma</b></span>
+    </a>
+    <a href="./index.html">Início</a>
+    <div class="nav-group" data-somente-admin>
+        <button type="button" class="nav-trigger" aria-haspopup="true">Cadastros</button>
+        <div class="nav-menu">
+            <a href="./empresa.html">Empresas</a>
+            <a href="./admin.html">Administradores e gerentes</a>
+            <a href="./funcionario.html">Funcionários</a>
+            <a href="./capacitacao.html">Capacitações</a>
+        </div>
+    </div>
+    <div class="nav-group">
+        <button type="button" class="nav-trigger active" aria-haspopup="true">Monitoramento</button>
+        <div class="nav-menu">
+            <a class="active" aria-current="page" href="./consumo.html">Consumo de IA</a>
+            <a href="./produtividade.html">Produtividade de IA</a>
+            <a href="./custos.html">Custos de IA</a>
+        </div>
+    </div>
     <a href="./governanca.html">Governança</a>
 </nav>
 
@@ -36,11 +51,133 @@
         <button type="button" onclick="consumir()">Registrar consumo</button>
     </div>
     <div id="alerta">Nenhum alerta avaliado.</div>
-    <pre id="out">Selecione uma empresa para registrar o consumo.</pre>
+    <div id="out" class="consumo-resultado" aria-live="polite">
+        <p class="consumo-vazio">Selecione uma empresa para registrar o consumo.</p>
+    </div>
+</section>
+
+<section>
+    <div class="section-heading">
+        <h2>Consumos da empresa</h2>
+        <span class="eyebrow" id="historicoEmpresa"></span>
+    </div>
+    <div id="resumoConsumo" class="kpis"></div>
+    <div id="historico" class="consumo-lista"></div>
 </section>
 
 <script>
     const out = document.getElementById('out');
+    const historico = document.getElementById('historico');
+    const resumoConsumo = document.getElementById('resumoConsumo');
+    const historicoEmpresa = document.getElementById('historicoEmpresa');
+
+    // Nível devolvido pelo serviço de alertas (INFO, WARNING, CRITICAL, ERROR) -> rótulo e cor do Estilo.css.
+    const NIVEIS = {
+        INFO: {rotulo: 'Normal', classe: 'good'},
+        WARNING: {rotulo: 'Atenção', classe: 'warn'},
+        CRITICAL: {rotulo: 'Crítico', classe: 'crit'},
+        ERROR: {rotulo: 'Erro', classe: 'crit'}
+    };
+    const nivel = level => NIVEIS[level] || {rotulo: level || 'Sem alerta', classe: ''};
+    const numero = new Intl.NumberFormat('pt-BR');
+    const dataHora = valor => valor ? new Date(valor).toLocaleString('pt-BR', {dateStyle: 'short', timeStyle: 'short'}) : '—';
+
+    function el(tag, classe, texto) {
+        const node = document.createElement(tag);
+        if (classe) node.className = classe;
+        if (texto !== undefined) node.textContent = texto;
+        return node;
+    }
+
+    function cartao(rotulo, valor, detalhe) {
+        const card = el('div', 'kpi');
+        card.append(el('span', 'eyebrow', rotulo));
+        if (valor instanceof Node) card.append(valor); else card.append(el('span', 'v', valor));
+        if (detalhe) card.append(el('span', 'd', detalhe));
+        return card;
+    }
+
+    function pilula(level) {
+        const n = nivel(level);
+        return el('span', `pill ${n.classe}`, n.rotulo);
+    }
+
+    function marcarAlerta(level) {
+        alerta.classList.remove('good', 'warn', 'crit');
+        const classe = nivel(level).classe;
+        if (classe) alerta.classList.add(classe);
+    }
+
+    function mostrarMensagem(texto, erro) {
+        out.replaceChildren(el('p', erro ? 'consumo-vazio erro' : 'consumo-vazio', texto));
+    }
+
+    function mostrarResultado(body) {
+        const titulo = el('h3', '', 'Consumo registrado');
+
+        const cards = el('div', 'kpis');
+        cards.append(
+            cartao('Tokens', numero.format(body.tokens)),
+            cartao('Modelo', body.model),
+            cartao('Registrado em', dataHora(body.occurredAt)),
+            cartao('Alerta', pilula(body.alertLevel), body.alertMessage)
+        );
+        out.replaceChildren(titulo, cards);
+    }
+
+    // Histórico da empresa selecionada: indicadores no topo e um cartão por registro, mais recente primeiro.
+    async function carregarHistorico() {
+        resumoConsumo.replaceChildren();
+        historico.replaceChildren();
+        const empresaId = empresaSelect.value;
+        historicoEmpresa.textContent = empresaId ? empresaSelect.selectedOptions[0].textContent : '';
+        if (!empresaId) {
+            historico.append(el('p', 'consumo-vazio', 'Selecione uma empresa para ver os consumos.'));
+            return;
+        }
+
+        const todos = await lerResposta(await fetch('/api/usages'));
+        const usos = todos.filter(uso => uso.empresaId === empresaId)
+            .sort((a, b) => new Date(b.occurredAt) - new Date(a.occurredAt));
+
+        if (!usos.length) {
+            historico.append(el('p', 'consumo-vazio', 'Nenhum consumo registrado para esta empresa ainda.'));
+            return;
+        }
+
+        const total = usos.reduce((soma, uso) => soma + Number(uso.tokens), 0);
+        const porModelo = {};
+        for (const uso of usos) porModelo[uso.model] = (porModelo[uso.model] || 0) + Number(uso.tokens);
+        const [modeloTop, tokensTop] = Object.entries(porModelo).sort((a, b) => b[1] - a[1])[0];
+
+        resumoConsumo.append(
+            cartao('Registros', numero.format(usos.length)),
+            cartao('Tokens consumidos', numero.format(total)),
+            cartao('Média por registro', numero.format(Math.round(total / usos.length)), 'tokens'),
+            cartao('Modelo mais usado', modeloTop, `${numero.format(tokensTop)} tokens (${Math.round(tokensTop / total * 100)}%)`)
+        );
+
+        const maior = Math.max(...usos.map(uso => Number(uso.tokens)));
+        for (const uso of usos.slice(0, 24)) {
+            const card = el('article', 'consumo-card');
+            const topo = el('div', 'consumo-card-topo');
+            topo.append(el('strong', '', uso.model), el('span', 'eyebrow', dataHora(uso.occurredAt)));
+
+            const valor = el('div', 'consumo-card-valor');
+            valor.append(el('span', 'num', numero.format(uso.tokens)), el('span', 'muted small', 'tokens'));
+
+            const barra = el('div', 'consumo-barra');
+            const preenchido = el('span');
+            preenchido.style.width = `${Math.max(3, Number(uso.tokens) / maior * 100)}%`;
+            barra.append(preenchido);
+
+            card.append(topo, valor, barra);
+            historico.append(card);
+        }
+        if (usos.length > 24) {
+            historico.append(el('p', 'consumo-vazio', `Mostrando os 24 mais recentes de ${numero.format(usos.length)} registros.`));
+        }
+    }
     const alerta = document.getElementById('alerta');
     const empresaSelect = document.getElementById('empresaId');
     const funcionarioSelect = document.getElementById('funcionarioId');
@@ -100,6 +237,7 @@
         const link = document.createElement('a');
         link.href = `./governanca.html?empresaId=${empresaId}&funcionarioId=${funcionarioId}#colaborador`;
         link.textContent = 'Ir para o aceite';
+        marcarAlerta('CRITICAL');
         alerta.textContent = 'Uso bloqueado. Políticas pendentes: '
             + pendentes.map(politica => `${politica.titulo} (versão ${politica.versao})`).join(', ') + '. ';
         alerta.appendChild(link);
@@ -121,24 +259,25 @@
                 })
             }));
 
-            out.textContent = JSON.stringify(body, null, 2);
-            alerta.textContent = `${body.alertLevel}: ${body.alertMessage}`;
+            mostrarResultado(body);
+            alerta.textContent = body.alertMessage || nivel(body.alertLevel).rotulo;
+            marcarAlerta(body.alertLevel);
+            carregarHistorico().catch(() => {});
         } catch (e) {
-            out.textContent = e.message;
+            mostrarMensagem(e.message, true);
             // O erro principal já está em "out"; se as pendências não puderem ser lidas, não há o que acrescentar.
             if (funcionarioSelect.value) mostrarPendencias().catch(() => {});
         }
     }
 
     empresaSelect.addEventListener('change', () => {
-        carregarFuncionarios().catch(e => {
-            out.textContent = e.message;
-        });
+        carregarFuncionarios().catch(e => mostrarMensagem(e.message, true));
+        carregarHistorico().catch(e => mostrarMensagem(e.message, true));
     });
 
-    carregarEmpresas().then(carregarFuncionarios).catch(e => {
-        out.textContent = e.message;
-    });
+    carregarEmpresas()
+        .then(() => Promise.all([carregarFuncionarios(), carregarHistorico()]))
+        .catch(e => mostrarMensagem(e.message, true));
 </script>
 <script src="./auth.js"></script>
 </body>

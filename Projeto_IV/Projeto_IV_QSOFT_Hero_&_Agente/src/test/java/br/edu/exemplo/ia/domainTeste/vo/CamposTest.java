@@ -10,7 +10,7 @@ class CamposTest {
     @Test
     void deveNormalizarCamposValidos() {
         assertEquals("Ana Silva", Campos.texto("  Ana Silva ", "Nome"));
-        assertEquals("ana@qsoft.com", Campos.email(" Ana@QSoft.com ", "E-mail"));
+        assertEquals("ana@prisma.com", Campos.email(" Ana@Prisma.com ", "E-mail"));
         assertEquals(11999990000L, Campos.telefone(11999990000L, "Telefone"));
         assertEquals(1133334444L, Campos.telefone(1133334444L, "Telefone"));
         assertEquals("12345678000199", Campos.digitos("12.345.678/0001-99", 14, "CNPJ"));
@@ -23,8 +23,8 @@ class CamposTest {
     @Test
     void deveRejeitarCamposInvalidos() {
         assertThrows(IllegalArgumentException.class, () -> Campos.texto(" ", "Nome"));
-        assertThrows(IllegalArgumentException.class, () -> Campos.email("ana.qsoft.com", "E-mail"));
-        assertThrows(IllegalArgumentException.class, () -> Campos.email("ana@qsoft", "E-mail"));
+        assertThrows(IllegalArgumentException.class, () -> Campos.email("ana.prisma.com", "E-mail"));
+        assertThrows(IllegalArgumentException.class, () -> Campos.email("ana@prisma", "E-mail"));
         assertThrows(IllegalArgumentException.class, () -> Campos.telefone(999990000L, "Telefone"));
         assertThrows(IllegalArgumentException.class, () -> Campos.telefone(null, "Telefone"));
         assertThrows(IllegalArgumentException.class, () -> Campos.digitos("1234", 8, "CEP"));

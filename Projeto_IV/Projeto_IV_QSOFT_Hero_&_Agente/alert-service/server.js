@@ -8,7 +8,7 @@ app.use(express.json());
 const alerts = [];
 
 app.get('/health', (_req, res) => {
-  res.json({ status: 'UP', service: 'qsoft-alert-service' });
+  res.json({ status: 'UP', service: 'prisma-alert-service' });
 });
 
 app.post('/api/alerts/evaluate', (req, res) => {
@@ -47,5 +47,5 @@ app.post('/api/alerts/evaluate', (req, res) => {
 app.get('/api/alerts', (_req, res) => res.json(alerts));
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`qsoft-alert-service disponível na porta ${PORT}`);
+  console.log(`prisma-alert-service disponível na porta ${PORT}`);
 });

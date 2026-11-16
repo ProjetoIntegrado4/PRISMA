@@ -53,7 +53,7 @@ class PoliticaServiceTest {
         funcionarioRepository = mock(FuncionarioRepository.class);
         service = new PoliticaService(politicaRepository, aceiteRepository, empresaRepository, funcionarioRepository);
 
-        empresa = new Empresa(new EmpresaVO("QSoft"), "Tecnologia");
+        empresa = new Empresa(new EmpresaVO("Prisma"), "Tecnologia");
         funcionario = new Funcionario("Ana Souza", empresa, "Analista");
         when(empresaRepository.findById(empresa.getId())).thenReturn(Optional.of(empresa));
         when(funcionarioRepository.findById(funcionario.getId())).thenReturn(Optional.of(funcionario));
@@ -87,7 +87,7 @@ class PoliticaServiceTest {
         assertNotNull(publicada.id());
         assertNotNull(publicada.codigo());
         assertEquals(empresa.getId(), publicada.empresaId());
-        assertEquals("QSoft", publicada.empresaNome());
+        assertEquals("Prisma", publicada.empresaNome());
         assertEquals("Uso responsável de IA", publicada.titulo());
         assertEquals(1, publicada.versao());
         assertTrue(publicada.obrigatoria());

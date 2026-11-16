@@ -3,29 +3,44 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>QAIcontrol - Administradores</title>
+  <title>Prisma - Administradores e gerentes</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="Estilo.css">
+  <link rel="icon" type="image/png" href="img/favicon.png">
 </head>
 <body>
   <nav class="top-nav" aria-label="Navegação principal">
-    <a href="./index.html">Home</a>
-    <a href="./empresa.html">Empresas</a>
-    <a class="active" href="./admin.html">Admins</a>
-    <a href="./funcionario.html">Funcionarios</a>
-    <a href="./capacitacao.html">Capacitações</a>
-    <a href="./consumo.html">Consumo de IA</a>
-    <a href="./produtividade.html">Produtividade IA</a>
-    <a href="./custos.html">Custos de IA</a>
-    <a href="./governanca.html">Governança</a>
+      <a class="brand" href="./index.html" aria-label="Prisma, início">
+          <img class="brand-logo" src="img/prisma-logo.png" alt="" aria-hidden="true">
+          <span class="brand-name"><b>Prisma</b></span>
+      </a>
+      <a href="./index.html">Início</a>
+      <div class="nav-group" data-somente-admin>
+          <button type="button" class="nav-trigger active" aria-haspopup="true">Cadastros</button>
+          <div class="nav-menu">
+              <a href="./empresa.html">Empresas</a>
+              <a class="active" aria-current="page" href="./admin.html">Administradores e gerentes</a>
+              <a href="./funcionario.html">Funcionários</a>
+              <a href="./capacitacao.html">Capacitações</a>
+          </div>
+      </div>
+      <div class="nav-group">
+          <button type="button" class="nav-trigger" aria-haspopup="true">Monitoramento</button>
+          <div class="nav-menu">
+              <a href="./consumo.html">Consumo de IA</a>
+              <a href="./produtividade.html">Produtividade de IA</a>
+              <a href="./custos.html">Custos de IA</a>
+          </div>
+      </div>
+      <a href="./governanca.html">Governança</a>
   </nav>
 
-  <h1>Cadastro de Administradores</h1>
-  <p>Associe cada administrador a uma empresa já cadastrada e acompanhe os registros existentes.</p>
+  <h1>Cadastro de Administradores e Gerentes</h1>
+  <p>Associe cada administrador ou gerente a uma empresa já cadastrada. O nível de acesso define o perfil: o gerente tem o mesmo acesso do administrador, mas não cadastra empresas.</p>
 
   <section>
-    <h2>Novo administrador</h2>
+    <h2>Novo administrador ou gerente</h2>
     <div class="form-row">
       <input id="nome" placeholder="Nome completo" aria-label="Nome completo" autocomplete="name" required>
       <input id="cpf" type="text" placeholder="CPF (000.000.000-00)" aria-label="CPF" inputmode="numeric" maxlength="14" autocomplete="off" required>
@@ -42,20 +57,24 @@
         <option value="ATIVO">Ativo</option>
         <option value="INATIVO">Inativo</option>
       </select>
-      <input id="nivelAcesso" placeholder="Nível de acesso" aria-label="Nível de acesso" required>
-      <button type="button" onclick="criarAdmin()">Cadastrar admin</button>
+      <select id="nivelAcesso" aria-label="Nível de acesso" required>
+        <option value="" disabled selected>Selecione o nível de acesso</option>
+        <option value="ADMIN">Administrador</option>
+        <option value="GERENTE">Gerente</option>
+      </select>
+      <button type="button" onclick="criarAdmin()">Cadastrar</button>
     </div>
     <div id="mensagem" class="message" aria-live="polite"></div>
   </section>
 
   <section class="info-box">
     <h2>Vinculo com empresa</h2>
-    <p>O administrador depende de uma empresa existente e pode cadastrar funcionários vinculados a essa mesma empresa.</p>
+    <p>O administrador e o gerente dependem de uma empresa existente e podem cadastrar funcionários vinculados a essa mesma empresa. Só o administrador cadastra empresas.</p>
   </section>
 
   <section>
     <div class="section-heading">
-      <h2>Administradores cadastrados</h2>
+      <h2>Administradores e gerentes cadastrados</h2>
       <button type="button" class="secondary-button" onclick="carregarAdmins()">Atualizar lista</button>
     </div>
     <div class="table-wrap">
@@ -142,7 +161,7 @@ async function criarAdmin() {
       body: JSON.stringify({ nome, cpf, email, telefone, empresaId, cargo, senha, confirmacaoSenha, statusConta, nivelAcesso })
     }));
 
-    mensagem.textContent = `Admin ${admin.nome} cadastrado com sucesso para a empresa ${admin.empresaNome}.`;
+    mensagem.textContent = `${admin.nivelAcesso === 'GERENTE' ? 'Gerente' : 'Admin'} ${admin.nome} cadastrado com sucesso para a empresa ${admin.empresaNome}.`;
     for (const id of ['nome', 'cpf', 'email', 'telefone', 'cargo', 'senha', 'confirmacaoSenha', 'nivelAcesso']) {
       document.getElementById(id).value = '';
     }

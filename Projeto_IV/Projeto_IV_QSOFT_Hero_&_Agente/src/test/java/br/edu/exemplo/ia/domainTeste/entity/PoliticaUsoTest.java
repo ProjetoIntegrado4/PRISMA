@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class PoliticaUsoTest {
 
     private static Empresa empresa() {
-        return new Empresa(new EmpresaVO("QSoft"), "Tecnologia");
+        return new Empresa(new EmpresaVO("Prisma"), "Tecnologia");
     }
 
     @Test

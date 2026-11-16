@@ -20,13 +20,13 @@ class EmpresaServiceTest {
         EmpresaService service = new EmpresaService(repository);
 
         EmpresaResponse response = service.create(new EmpresaRequest(
-                "QSoft", "QSoft Tecnologia Ltda", "12345678000199", 25,
+                "Prisma", "Prisma Tecnologia Ltda", "12345678000199", 25,
                 "01310-100", "Avenida Paulista, 1000", "São Paulo", "SP",
                 "Ana Silva", "Tecnologia"
         ));
 
-        assertEquals("QSoft", response.name());
-        assertEquals("QSoft Tecnologia Ltda", response.razaoSocial());
+        assertEquals("Prisma", response.name());
+        assertEquals("Prisma Tecnologia Ltda", response.razaoSocial());
         assertEquals("12345678000199", response.cnpj());
         assertEquals(25, response.numeroFuncionarios());
         assertEquals("01310100", response.cep());

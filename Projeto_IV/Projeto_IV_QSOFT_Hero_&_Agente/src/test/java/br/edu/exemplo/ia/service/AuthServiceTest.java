@@ -33,14 +33,14 @@ class AuthServiceTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         var authentication = UsernamePasswordAuthenticationToken.authenticated(
-            "admin@qsoft.com", "credential", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+            "admin@prisma.com", "credential", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
         );
         when(authenticationManager.authenticate(any())).thenReturn(authentication);
 
-        AuthService service = new AuthService(authenticationManager, contextRepository, "Administrador QSOFT");
-        AuthResponse result = service.login("admin@qsoft.com", "Qsoft123!", request, response);
+        AuthService service = new AuthService(authenticationManager, contextRepository, "Administrador Prisma");
+        AuthResponse result = service.login("admin@prisma.com", "Prisma123!", request, response);
 
-        assertEquals(new AuthResponse("Administrador QSOFT", "admin@qsoft.com", "ADMIN"), result);
+        assertEquals(new AuthResponse("Administrador Prisma", "admin@prisma.com", "ADMIN"), result);
         verify(contextRepository).saveContext(any(), org.mockito.ArgumentMatchers.same(request),
                 org.mockito.ArgumentMatchers.same(response));
         assertEquals(authentication, SecurityContextHolder.getContext().getAuthentication());

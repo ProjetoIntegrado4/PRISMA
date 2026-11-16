@@ -8,7 +8,7 @@ class EmpresaVOTest {
 
     @Test
     void empresaVODeveAceitarNomeValido() {
-        assertEquals("QSoft", new EmpresaVO("QSoft").value());
+        assertEquals("Prisma", new EmpresaVO("Prisma").value());
     }
 
     @Test
@@ -19,7 +19,7 @@ class EmpresaVOTest {
 
     @Test
     void empresaNameDeveAceitarNomeValido() {
-        assertEquals("QSoft", new EmpresaName("QSoft").value());
+        assertEquals("Prisma", new EmpresaName("Prisma").value());
     }
 
     @Test

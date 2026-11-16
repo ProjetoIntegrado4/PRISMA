@@ -10,9 +10,9 @@ class EmpresaTest {
 
     @Test
     void deveCriarEmpresaSimplesComValoresPadrao() {
-        Empresa e = new Empresa(new EmpresaVO("QSoft"), "Tecnologia");
+        Empresa e = new Empresa(new EmpresaVO("Prisma"), "Tecnologia");
         assertNotNull(e.getId());
-        assertEquals(new EmpresaVO("QSoft"), e.getName());
+        assertEquals(new EmpresaVO("Prisma"), e.getName());
         assertEquals("Tecnologia", e.getArea());
         assertEquals(0, e.getNumeroFuncionarios());
         assertNull(e.getRazaoSocial());
@@ -26,9 +26,9 @@ class EmpresaTest {
 
     @Test
     void deveCriarEmpresaCompleta() {
-        Empresa e = new Empresa(new EmpresaVO("QSoft"), "Tecnologia", "QSoft Ltda", "12345678000199", 25,
+        Empresa e = new Empresa(new EmpresaVO("Prisma"), "Tecnologia", "Prisma Ltda", "12345678000199", 25,
                 "01310-100", "Av. Paulista, 1000", "São Paulo", "SP", "Ana");
-        assertEquals("QSoft Ltda", e.getRazaoSocial());
+        assertEquals("Prisma Ltda", e.getRazaoSocial());
         assertEquals("12345678000199", e.getCnpj());
         assertEquals(25, e.getNumeroFuncionarios());
         assertEquals("01310-100", e.getCep());

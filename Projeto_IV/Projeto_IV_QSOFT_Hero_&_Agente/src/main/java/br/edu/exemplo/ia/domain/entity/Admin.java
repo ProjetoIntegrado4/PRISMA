@@ -2,6 +2,7 @@ package br.edu.exemplo.ia.domain.entity;
 
 import br.edu.exemplo.ia.domain.vo.AdminVO;
 import br.edu.exemplo.ia.domain.vo.CodigoCsv;
+import br.edu.exemplo.ia.domain.vo.NivelAcesso;
 
 import java.util.UUID;
 
@@ -91,6 +92,11 @@ public class Admin {
 
     public String getStatusConta() {
         return dados == null ? null : dados.statusConta();
+    }
+
+    /** Gerente: mesmo acesso do administrador, mas não cadastra empresas. */
+    public boolean isGerente() {
+        return NivelAcesso.doRegistro(getNivelAcesso()) == NivelAcesso.GERENTE;
     }
 
     public String getNivelAcesso() {

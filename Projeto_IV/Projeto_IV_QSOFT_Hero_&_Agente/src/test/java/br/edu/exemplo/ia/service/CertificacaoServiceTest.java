@@ -47,7 +47,7 @@ class CertificacaoServiceTest {
         funcionarioRepository = mock(FuncionarioRepository.class);
         service = new CertificacaoService(certificacaoRepository, funcionarioRepository, new PontuacaoAiLiteracy(10, 20));
 
-        empresa = new Empresa(new EmpresaVO("QSoft"), "Tecnologia");
+        empresa = new Empresa(new EmpresaVO("Prisma"), "Tecnologia");
         funcionario = new Funcionario("Ana Souza", empresa, "Analista");
         when(funcionarioRepository.findById(funcionario.getId())).thenReturn(Optional.of(funcionario));
         when(certificacaoRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));

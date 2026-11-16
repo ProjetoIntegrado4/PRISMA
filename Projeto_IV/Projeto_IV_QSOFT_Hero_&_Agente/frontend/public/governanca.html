@@ -3,22 +3,37 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>QAIcontrol - Governança de IA</title>
+    <title>Prisma - Governança de IA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
     <link rel="stylesheet" href="Estilo.css">
+    <link rel="icon" type="image/png" href="img/favicon.png">
 </head>
 <body>
 <nav class="top-nav" aria-label="Navegação principal">
-    <a href="./index.html">Home</a>
-    <a href="./empresa.html">Empresas</a>
-    <a href="./admin.html">Admins</a>
-    <a href="./funcionario.html">Funcionarios</a>
-    <a href="./capacitacao.html">Capacitações</a>
-    <a href="./consumo.html">Consumo de IA</a>
-    <a href="./produtividade.html">Produtividade IA</a>
-    <a href="./custos.html">Custos de IA</a>
-    <a class="active" href="./governanca.html">Governança</a>
+    <a class="brand" href="./index.html" aria-label="Prisma, início">
+        <img class="brand-logo" src="img/prisma-logo.png" alt="" aria-hidden="true">
+        <span class="brand-name"><b>Prisma</b></span>
+    </a>
+    <a href="./index.html">Início</a>
+    <div class="nav-group" data-somente-admin>
+        <button type="button" class="nav-trigger" aria-haspopup="true">Cadastros</button>
+        <div class="nav-menu">
+            <a href="./empresa.html">Empresas</a>
+            <a href="./admin.html">Administradores e gerentes</a>
+            <a href="./funcionario.html">Funcionários</a>
+            <a href="./capacitacao.html">Capacitações</a>
+        </div>
+    </div>
+    <div class="nav-group">
+        <button type="button" class="nav-trigger" aria-haspopup="true">Monitoramento</button>
+        <div class="nav-menu">
+            <a href="./consumo.html">Consumo de IA</a>
+            <a href="./produtividade.html">Produtividade de IA</a>
+            <a href="./custos.html">Custos de IA</a>
+        </div>
+    </div>
+    <a class="active" aria-current="page" href="./governanca.html">Governança</a>
 </nav>
 
 <h1>Governança de IA</h1>
@@ -26,7 +41,7 @@
 
 <div class="tabs" role="tablist" aria-label="Funcionalidades da governança">
     <button type="button" role="tab" id="aba-vigentes" aria-controls="painel-vigentes" data-aba="vigentes">Políticas vigentes</button>
-    <button type="button" role="tab" id="aba-publicar" aria-controls="painel-publicar" data-aba="publicar">Publicar política</button>
+    <button type="button" role="tab" data-somente-admin id="aba-publicar" aria-controls="painel-publicar" data-aba="publicar">Publicar política</button>
     <button type="button" role="tab" id="aba-aceite" aria-controls="painel-aceite" data-aba="aceite">Aceite do colaborador</button>
     <button type="button" role="tab" id="aba-historico" aria-controls="painel-historico" data-aba="historico">Histórico de aceites</button>
 </div>
@@ -43,7 +58,8 @@
 
 <!-- Empresa e colaborador das abas de aceite e histórico -->
 <section id="colaborador" class="barra-aba" data-abas="aceite historico">
-    <p class="note">Provisório: enquanto não existe login de colaborador, escolha a empresa e o colaborador. O aceite
+    <p class="note" data-somente-funcionario>Estas são as políticas da sua empresa e os seus aceites.</p>
+    <p class="note" data-somente-admin>Escolha a empresa e o colaborador. O aceite
         fica registrado com o colaborador, a versão da política e a data.</p>
     <div class="form-row">
         <div class="ctl">
@@ -110,7 +126,7 @@
     </section>
 </div>
 
-<div role="tabpanel" id="painel-publicar" aria-labelledby="aba-publicar" class="painel-aba" hidden>
+<div role="tabpanel" data-somente-admin id="painel-publicar" aria-labelledby="aba-publicar" class="painel-aba" hidden>
     <section>
         <h2>Publicar política (Administrador)</h2>
         <p id="editando" class="callout" hidden></p>
@@ -218,6 +234,8 @@
 
     function abrirAba(aba, foco) {
         if (!ABAS.includes(aba)) aba = 'vigentes';
+        // Publicar política é só da gestão (administrador ou gerente).
+        if (aba === 'publicar' && document.documentElement.dataset.perfil === 'FUNCIONARIO') aba = 'aceite';
         for (const botao of botoesAba) {
             const ativa = botao.dataset.aba === aba;
             botao.setAttribute('aria-selected', String(ativa));
@@ -244,6 +262,7 @@
         });
     });
 
+    const abaPedida = location.hash.slice(1);
     // O link do Consumo de IA usa #colaborador: abre direto no aceite.
     abrirAba(location.hash === '#colaborador' ? 'aceite' : location.hash.slice(1));
 
@@ -319,6 +338,11 @@
         return botao;
     }
 
+    function botaoSoAdmin(botao) {
+        botao.dataset.somenteAdmin = '';
+        return botao;
+    }
+
     async function carregarEmpresas() {
         const empresas = await lerResposta(await fetch('/api/empresa'));
         const itens = empresas.map(empresa => ({id: empresa.id, nome: `${empresa.name} (${empresa.area})`}));
@@ -344,7 +368,7 @@
         for (const politica of politicas) {
             const acoes = document.createElement('div');
             acoes.append(
-                criarBotao('Nova versão', () => iniciarNovaVersao(politica), 'secondary-button'), ' ',
+                botaoSoAdmin(criarBotao('Nova versão', () => iniciarNovaVersao(politica), 'secondary-button')), ' ',
                 criarBotao('Histórico', () => carregarVersoes(politica.codigo), 'secondary-button'));
             adicionarLinha(corpo, [politica.titulo, politica.versao, simOuNao(politica.obrigatoria),
                 formatarDataHora(politica.publicadaEm), acoes], [1]);
@@ -597,8 +621,29 @@
         carregarColaborador();
     });
 
+    // Funcionário logado: a empresa e o colaborador são os dele, e a página abre no aceite.
+    async function abrirComoFuncionario() {
+        const usuario = await (window.prismaUsuario || Promise.resolve(null));
+        if (!usuario || usuario.perfil !== 'FUNCIONARIO') return;
+        document.documentElement.dataset.perfil = 'FUNCIONARIO';
+        if (!['vigentes', 'aceite', 'historico'].includes(abaPedida)) abrirAba('aceite');
+        if (!usuario.empresaId) return;
+
+        empresaAdminSelect.value = usuario.empresaId;
+        empresaColaboradorSelect.value = usuario.empresaId;
+        empresaAdminSelect.disabled = true;
+        empresaColaboradorSelect.disabled = true;
+        await Promise.all([carregarPoliticasVigentes(), carregarFuncionarios()]);
+        if (!usuario.funcionarioId) return;
+
+        funcionarioSelect.value = usuario.funcionarioId;
+        funcionarioSelect.disabled = true;
+        await carregarColaborador();
+    }
+
     carregarEmpresas()
         .then(abrirColaboradorDoLink)
+        .then(abrirComoFuncionario)
         .catch(e => mostrarMensagem(mensagemAdmin, e.message, 'erro'));
 </script>
 <script src="./auth.js"></script>

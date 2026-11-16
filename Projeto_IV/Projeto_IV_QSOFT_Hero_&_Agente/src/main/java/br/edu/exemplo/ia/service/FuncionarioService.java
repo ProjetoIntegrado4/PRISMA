@@ -37,11 +37,13 @@ public class FuncionarioService implements FuncionarioUseCase {
         Admin gestorResponsavel = request.gestorResponsavelId() == null
             ? null
             : loadGestor(request.gestorResponsavelId(), empresa);
+        String email = Campos.email(request.emailCorporativo(), "E-mail corporativo do funcionário");
+        EmailsDeLogin.garantirLivre(email, adminRepository, funcionarioRepository);
         Funcionario funcionario = funcionarioRepository.save(
             new Funcionario(FuncionarioVO.completo(
                 Campos.texto(request.nome(), "Nome do funcionário"),
                 Cpf.normalizar(request.cpf(), "CPF do funcionário"),
-                Campos.email(request.emailCorporativo(), "E-mail corporativo do funcionário"),
+                email,
                 Campos.telefone(request.telefone(), "Telefone do funcionário"),
                 Campos.texto(request.cargo(), "Cargo do funcionário"),
                 Campos.texto(request.setor(), "Setor do funcionário"),

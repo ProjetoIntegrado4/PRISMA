@@ -51,6 +51,10 @@ public class AuthService implements AuthUseCase {
                 .findFirst()
                 .map(authority -> authority.getAuthority().replaceFirst("^ROLE_", ""))
                 .orElse("USUARIO");
+        if (authentication.getPrincipal() instanceof UsuarioPrisma usuario) {
+            return new AuthResponse(usuario.getNome(), authentication.getName(), profile,
+                    usuario.getEmpresaId(), usuario.getFuncionarioId());
+        }
         return new AuthResponse(displayName, authentication.getName(), profile);
     }
-}
+}

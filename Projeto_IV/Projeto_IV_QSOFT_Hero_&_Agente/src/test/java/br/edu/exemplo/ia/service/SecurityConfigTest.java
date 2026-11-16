@@ -23,10 +23,10 @@ class SecurityConfigTest {
     void deveCriarUsuarioTemporarioComSenhaCriptografada() {
         PasswordEncoder encoder = config.passwordEncoder();
 
-        UserDetails user = config.userDetailsService(encoder, "admin@qsoft.com", "Qsoft123!")
-                .loadUserByUsername("admin@qsoft.com");
+        UserDetails user = config.userDetailsService(encoder, "admin@prisma.com", "Prisma123!")
+                .loadUserByUsername("admin@prisma.com");
 
-        assertTrue(encoder.matches("Qsoft123!", user.getPassword()));
+        assertTrue(encoder.matches("Prisma123!", user.getPassword()));
         assertTrue(user.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
     }
 

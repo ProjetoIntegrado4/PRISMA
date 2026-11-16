@@ -64,7 +64,7 @@ class PoliticaControllerTest {
     private UsageUseCase usages;
 
     private static PoliticaResponse politica(int versao) {
-        return new PoliticaResponse(POLITICA, CODIGO, EMPRESA, "QSoft", "Uso responsável de IA",
+        return new PoliticaResponse(POLITICA, CODIGO, EMPRESA, "Prisma", "Uso responsável de IA",
                 "Não insira dados pessoais.", versao, true, true, Instant.parse("2026-10-22T12:00:00Z"));
     }
 
@@ -94,7 +94,7 @@ class PoliticaControllerTest {
     void usuarioSemPerfilAdminNaoDevePublicarPolitica() throws Exception {
         mvc.perform(post("/api/politicas").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(CORPO_POLITICA))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value("Acesso restrito ao perfil Administrador"));
+                .andExpect(jsonPath("$.message").value("Acesso nao permitido para o seu perfil"));
         verifyNoInteractions(useCase);
     }
 

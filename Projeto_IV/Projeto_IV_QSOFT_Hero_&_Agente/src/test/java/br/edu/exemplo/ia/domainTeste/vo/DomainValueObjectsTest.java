@@ -39,7 +39,7 @@ class DomainValueObjectsTest {
     @Test
     void deveValidarDadosDeEmpresaEConsumoNosValueObjects() {
         assertThrows(IllegalArgumentException.class, () -> new EmpresaDadosVO(
-                "Tecnologia", "QSoft Ltda", "12345678000199", -1,
+                "Tecnologia", "Prisma Ltda", "12345678000199", -1,
                 "01310-100", "Av. Paulista, 1000", "São Paulo", "SP", "Ana"
         ).validar());
         assertThrows(IllegalArgumentException.class, () -> new AIUsageVO(0, "gpt-model").validar());

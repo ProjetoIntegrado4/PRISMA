@@ -1,4 +1,4 @@
-# Projeto IV - QSOFT - Versão Corrigida
+# Projeto IV - Prisma - Versão Corrigida
 
 Exemplo didático com:
 
@@ -58,12 +58,12 @@ nome, CPF, e-mail, telefone, matrícula, hash da senha, gestor) entram como colu
 arquivo, vazias nas linhas antigas. Senhas são gravadas apenas como hash BCrypt. O id usado pela API é
 derivado do código (`C01` sempre tem o mesmo id), e a coluna "Código" das telas mostra esse código.
 
-**Onde fica a pasta.** O caminho está num único lugar: a variável `QSOFT_DADOS_DIR` do arquivo `.env`
+**Onde fica a pasta.** O caminho está num único lugar: a variável `PRISMA_DADOS_DIR` do arquivo `.env`
 na raiz do projeto. Ela é usada pelo `docker compose` (volume do backend, montado em `/app/dados`) e
 pelo Spring quando roda fora do Docker. Para apontar para outra pasta (por exemplo, a pasta Git):
 
 ```text
-QSOFT_DADOS_DIR=C:/caminho/da/nova/pasta
+PRISMA_DADOS_DIR=C:/caminho/da/nova/pasta
 ```
 
 Depois, reinicie o backend: `docker compose up -d --force-recreate backend`. Sem `.env`, o padrão é
@@ -98,14 +98,34 @@ pgAdmin:
 - usuário: `ia`
 - senha: `ia`
 
-## Login temporário
+## Login e perfis de acesso
 
-Enquanto não houver integração com usuários persistidos no banco, o acesso de desenvolvimento é:
+Há três perfis:
 
-- usuário: `admin@qsoft.com`
-- senha: `Qsoft123!`
+- **Administrador** (`ADMIN`): visão completa (Cadastros, Monitoramento e Governança, inclusive publicar política).
+- **Gerente** (`GERENTE`): igual ao administrador, mas não cadastra empresas. É cadastrado na tela de
+  Administradores, escolhendo o nível de acesso "Gerente" (`nivel_acesso = GERENTE` em `admins.csv`).
+- **Funcionário** (`FUNCIONARIO`): Início (com botão para a Produtividade de IA), todas as páginas de Monitoramento e
+  Governança sem publicar política. Ao abrir a Governança, já vê a própria empresa e os próprios aceites.
 
-O backend valida a senha com BCrypt e mantém a autenticação em sessão HTTP. Antes de disponibilizar o sistema fora do ambiente local, configure `TEMP_LOGIN_USERNAME`, `TEMP_LOGIN_PASSWORD` e `TEMP_LOGIN_NAME` com valores próprios. O usuário temporário em memória não substitui a futura autenticação vinculada aos registros de admins e funcionários.
+O backend barra o funcionário nos cadastros (`/api/admin`, `/api/certificacao`, gravação em `/api/empresa` e
+`/api/funcionario`) e na publicação de políticas; o BFF devolve o funcionário ao Início se ele abrir uma página de cadastro.
+
+Contas que funcionam:
+
+| Perfil | Usuário | Senha |
+|---|---|---|
+| Administrador (temporário) | `admin@prisma.com` | `Prisma123!` |
+| Gerente (temporário) | `gerente@prisma.com` | `Prisma123!` |
+| Funcionário (temporário) | `funcionario@prisma.com` | `Prisma123!` |
+| Administrador da base (`admins.csv`) | e-mail do admin, ex.: `leticia.rocha@nexocodesolucoes.com.br` | `Qsoft@2026` |
+| Funcionário da base (`employees.csv`, ativo) | e-mail corporativo, ex.: `luana.araujo@nexocodesolucoes.com.br` | `Qsoft@2026` |
+
+Todo admin, gerente ou funcionário cadastrado pelo site já entra com o e-mail e a senha do cadastro; o e-mail não
+pode repetir entre os cadastros. Admins antigos da base com outro nível (TOTAL, GESTOR) continuam como administrador.
+Na base, só entram contas ativas (`status_conta = ATIVO` nos admins, `active = True` nos funcionários), e a senha é
+conferida com o hash BCrypt da coluna `senha_hash`. As contas temporárias ficam em `application.yml` e podem ser trocadas
+por `TEMP_LOGIN_*` e `TEMP_GERENTE_*`, `TEMP_FUNCIONARIO_USERNAME`, `TEMP_FUNCIONARIO_PASSWORD` e `TEMP_FUNCIONARIO_NAME`.
 
 ## Teste manual da API
 
@@ -252,7 +272,7 @@ Teste manual pela API (com o cookie de sessão e o token CSRF, como no navegador
 curl -c c.txt -b c.txt http://localhost:8080/api/auth/csrf
 TOKEN=$(grep XSRF-TOKEN c.txt | awk '{print $7}')
 curl -c c.txt -b c.txt -H "X-XSRF-TOKEN: $TOKEN" -H "Content-Type: application/json" \
-  -d '{"usuario":"admin@qsoft.com","senha":"Qsoft123!"}' http://localhost:8080/api/auth/login
+  -d '{"usuario":"admin@prisma.com","senha":"Prisma123!"}' http://localhost:8080/api/auth/login
 curl -b c.txt -H "X-XSRF-TOKEN: $TOKEN" -H "Content-Type: application/json" \
   -d '{"empresaId":"UUID-DA-EMPRESA","titulo":"Uso responsável de IA","conteudo":"Não insira dados pessoais.","obrigatoria":true}' \
   http://localhost:8080/api/politicas
@@ -292,7 +312,7 @@ Para acrescentar uma análise:
 4. no frontend, crie `frontend/public/js/produtividade/secoes/<nome>.js`, registre em `SECOES` (`main.js`)
    e marque o HTML com `data-secao="<chave>"`.
 
-**Importação de CSV.** Na subida, cada `*.csv` da pasta da base de dados (`QSOFT_DADOS_DIR`, no `.env`) vira a
+**Importação de CSV.** Na subida, cada `*.csv` da pasta da base de dados (`PRISMA_DADOS_DIR`, no `.env`) vira a
 tabela de mesmo nome, se ela não existir ou estiver vazia. Os tipos das colunas são deduzidos dos valores, a
 primeira coluna `_id` com valores únicos vira chave primária e as demais `_id` ganham índice. Tabelas que já
 têm dados não são alteradas. Cada carga da página consulta o banco: registros novos aparecem ao clicar em
@@ -321,5 +341,5 @@ quando um deles estiver instalado.
 ## Dados de demonstração
 
 - **Base CSV:** `admins.csv` tem dois admins por empresa (Diretor(a) de Inovação e Gestor(a) de TI) e `employees.csv` tem nome, CPF, e-mail, telefone, matrícula e gestor de cada colaborador. A senha de demonstração de todos é `Qsoft@2026`, guardada só como hash BCrypt. O script que gerou esses dados só preenche células vazias e guardou os originais em `_backup_antes_preenchimento`.
-- **PostgreSQL:** na subida, `service/demonstracao/DemonstracaoSeeder` popula políticas de uso de IA (três por empresa, uma já na versão 2), aceites e consumo de IA, tudo derivado da base. Aceitam as políticas os colaboradores ativos treinados em Governança ou Segurança e cerca de dois terços dos demais; o restante fica pendente. O consumo traz os 15 usos mais recentes de cada empresa (`ai_usage_logs`). Só preenche tabela vazia. Para desligar, use `QSOFT_DEMONSTRACAO=false`.
+- **PostgreSQL:** na subida, `service/demonstracao/DemonstracaoSeeder` popula políticas de uso de IA (três por empresa, uma já na versão 2), aceites e consumo de IA, tudo derivado da base. Aceitam as políticas os colaboradores ativos treinados em Governança ou Segurança e cerca de dois terços dos demais; o restante fica pendente. O consumo traz os 15 usos mais recentes de cada empresa (`ai_usage_logs`). Só preenche tabela vazia. Para desligar, use `PRISMA_DEMONSTRACAO=false`.
 

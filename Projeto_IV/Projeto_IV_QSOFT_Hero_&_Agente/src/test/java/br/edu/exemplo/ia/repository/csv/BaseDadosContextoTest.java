@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-/** O Spring monta os repositórios em CSV com a pasta vinda de QSOFT_DADOS_DIR / qsoft.dados.dir. */
+/** O Spring monta os repositórios em CSV com a pasta vinda de PRISMA_DADOS_DIR / prisma.dados.dir. */
 class BaseDadosContextoTest {
 
     @TempDir
@@ -24,7 +24,7 @@ class BaseDadosContextoTest {
         new ApplicationContextRunner()
                 .withUserConfiguration(BaseDadosConfig.class, BaseDadosCsv.class, EmpresaCsvRepository.class,
                         AdminCsvRepository.class, FuncionarioCsvRepository.class)
-                .withPropertyValues("qsoft.dados.dir=" + pasta)
+                .withPropertyValues("prisma.dados.dir=" + pasta)
                 .run(ctx -> {
                     assertEquals(pasta, ctx.getBean(BaseDadosCsv.class).pasta());
                     assertInstanceOf(EmpresaCsvRepository.class, ctx.getBean(EmpresaRepository.class));

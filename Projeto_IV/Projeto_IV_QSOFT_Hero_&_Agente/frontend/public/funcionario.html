@@ -3,21 +3,36 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>QAIcontrol - Funcionarios</title>
+    <title>Prisma - Funcionarios</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
     <link rel="stylesheet" href="Estilo.css">
+    <link rel="icon" type="image/png" href="img/favicon.png">
 </head>
 <body>
 <nav class="top-nav" aria-label="Navegação principal">
-    <a href="./index.html">Home</a>
-    <a href="./empresa.html">Empresas</a>
-    <a href="./admin.html">Admins</a>
-    <a class="active" href="./funcionario.html">Funcionarios</a>
-    <a href="./capacitacao.html">Capacitações</a>
-    <a href="./consumo.html">Consumo de IA</a>
-    <a href="./produtividade.html">Produtividade IA</a>
-    <a href="./custos.html">Custos de IA</a>
+    <a class="brand" href="./index.html" aria-label="Prisma, início">
+        <img class="brand-logo" src="img/prisma-logo.png" alt="" aria-hidden="true">
+        <span class="brand-name"><b>Prisma</b></span>
+    </a>
+    <a href="./index.html">Início</a>
+    <div class="nav-group" data-somente-admin>
+        <button type="button" class="nav-trigger active" aria-haspopup="true">Cadastros</button>
+        <div class="nav-menu">
+            <a href="./empresa.html">Empresas</a>
+            <a href="./admin.html">Administradores e gerentes</a>
+            <a class="active" aria-current="page" href="./funcionario.html">Funcionários</a>
+            <a href="./capacitacao.html">Capacitações</a>
+        </div>
+    </div>
+    <div class="nav-group">
+        <button type="button" class="nav-trigger" aria-haspopup="true">Monitoramento</button>
+        <div class="nav-menu">
+            <a href="./consumo.html">Consumo de IA</a>
+            <a href="./produtividade.html">Produtividade de IA</a>
+            <a href="./custos.html">Custos de IA</a>
+        </div>
+    </div>
     <a href="./governanca.html">Governança</a>
 </nav>
 

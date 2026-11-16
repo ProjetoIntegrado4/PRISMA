@@ -2,7 +2,7 @@ services:
 
   postgres:
     image: postgres:17-alpine
-    container_name: qsoft-postgres
+    container_name: prisma-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: iadb
@@ -22,7 +22,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4:9
-    container_name: qsoft-pgadmin
+    container_name: prisma-pgadmin
     restart: unless-stopped
     depends_on:
       - postgres
@@ -40,7 +40,7 @@ services:
   alert-service:
     build:
       context: ./alert-service
-    container_name: qsoft-alert-service
+    container_name: prisma-alert-service
     restart: unless-stopped
     environment:
       PORT: 3001
@@ -53,26 +53,26 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: qsoft-backend
+    container_name: prisma-backend
     restart: unless-stopped
     environment:
       DB_URL: jdbc:postgresql://postgres:5432/iadb
       DB_USER: ia
       DB_PASSWORD: ia
       ALERT_SERVICE_URL: http://alert-service:3001
-      TEMP_LOGIN_USERNAME: ${TEMP_LOGIN_USERNAME:-admin@qsoft.com}
-      TEMP_LOGIN_PASSWORD: ${TEMP_LOGIN_PASSWORD:-Qsoft123!}
-      TEMP_LOGIN_NAME: ${TEMP_LOGIN_NAME:-Administrador QSOFT}
+      TEMP_LOGIN_USERNAME: ${TEMP_LOGIN_USERNAME:-admin@prisma.com}
+      TEMP_LOGIN_PASSWORD: ${TEMP_LOGIN_PASSWORD:-Prisma123!}
+      TEMP_LOGIN_NAME: ${TEMP_LOGIN_NAME:-Administrador Prisma}
       # Dentro do contêiner a base de dados fica sempre em /app/dados; a pasta real do computador
-      # vem do QSOFT_DADOS_DIR do arquivo .env (veja o volume abaixo).
-      QSOFT_DADOS_DIR: /app/dados
+      # vem do PRISMA_DADOS_DIR do arquivo .env (veja o volume abaixo).
+      PRISMA_DADOS_DIR: /app/dados
     ports:
       - "8080:8080"
     volumes:
       # Base de dados em CSV (cadastros e painel). Leitura e escrita: o que for cadastrado no site
       # é gravado nos CSVs, e o que for acrescentado nos CSVs aparece no site.
       - type: bind
-        source: ${QSOFT_DADOS_DIR:-./dados/csv}
+        source: ${PRISMA_DADOS_DIR:-./dados/csv}
         target: /app/dados
     depends_on:
       - postgres
@@ -84,7 +84,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: qsoft-frontend-bff
+    container_name: prisma-frontend-bff
     restart: unless-stopped
     environment:
       PORT: 3000

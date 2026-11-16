@@ -33,19 +33,19 @@ class FuncionarioServiceTest {
         EmpresaRepository empresaRepository = mock(EmpresaRepository.class);
         AdminRepository adminRepository = mock(AdminRepository.class);
 
-        Empresa empresa = new Empresa(new EmpresaVO("QSoft"), "Tecnologia");
+        Empresa empresa = new Empresa(new EmpresaVO("Prisma"), "Tecnologia");
         when(empresaRepository.findById(empresa.getId())).thenReturn(Optional.of(empresa));
         when(funcionarioRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         FuncionarioService service = new FuncionarioService(funcionarioRepository, empresaRepository, adminRepository);
         FuncionarioResponse response = service.create(new FuncionarioRequest(
-            "Carlos Silva", "529.982.247-25", "carlos@qsoft.com", 11999990000L, "Analista",
+            "Carlos Silva", "529.982.247-25", "carlos@prisma.com", 11999990000L, "Analista",
             "Tecnologia", empresa.getId(), "Q001", "senha-segura", "ATIVO", null
         ));
 
         assertEquals("Carlos Silva", response.nome());
         assertEquals("52998224725", response.cpf());
-        assertEquals("carlos@qsoft.com", response.emailCorporativo());
+        assertEquals("carlos@prisma.com", response.emailCorporativo());
         assertEquals(11999990000L, response.telefone());
         assertEquals("Tecnologia", response.setor());
         assertEquals("Q001", response.matricula());
@@ -73,7 +73,7 @@ class FuncionarioServiceTest {
         IllegalArgumentException ex = assertThrows(
                 IllegalArgumentException.class,
             () -> service.create(new FuncionarioRequest(
-                "Carlos Silva", "52998224725", "carlos@qsoft.com", 11999990000L, "Analista",
+                "Carlos Silva", "52998224725", "carlos@prisma.com", 11999990000L, "Analista",
                 "Tecnologia", empresaId, "Q001", "senha-segura", "ATIVO", null
             ))
         );
@@ -86,9 +86,9 @@ class FuncionarioServiceTest {
         FuncionarioRepository funcionarioRepository = mock(FuncionarioRepository.class);
         EmpresaRepository empresaRepository = mock(EmpresaRepository.class);
         AdminRepository adminRepository = mock(AdminRepository.class);
-        Empresa empresa = new Empresa(new EmpresaVO("QSoft"), "Tecnologia");
+        Empresa empresa = new Empresa(new EmpresaVO("Prisma"), "Tecnologia");
         Admin gestor = new Admin(
-            "Ana Gestora", "12345678901", "ana@qsoft.com", 11999990001L, empresa,
+            "Ana Gestora", "12345678901", "ana@prisma.com", 11999990001L, empresa,
             "Gerente", "hash-gestora", "ATIVO", "ADMIN"
         );
         when(empresaRepository.findById(empresa.getId())).thenReturn(Optional.of(empresa));
@@ -97,7 +97,7 @@ class FuncionarioServiceTest {
 
         FuncionarioService service = new FuncionarioService(funcionarioRepository, empresaRepository, adminRepository);
         FuncionarioResponse response = service.create(new FuncionarioRequest(
-            "Carlos Silva", "52998224725", "carlos@qsoft.com", 11999990000L, "Analista",
+            "Carlos Silva", "52998224725", "carlos@prisma.com", 11999990000L, "Analista",
             "Tecnologia", empresa.getId(), "Q001", "senha-segura", "ATIVO", gestor.getId()
         ));
 
@@ -110,7 +110,7 @@ class FuncionarioServiceTest {
         FuncionarioRepository funcionarioRepository = mock(FuncionarioRepository.class);
         EmpresaRepository empresaRepository = mock(EmpresaRepository.class);
         AdminRepository adminRepository = mock(AdminRepository.class);
-        Empresa empresa = new Empresa(new EmpresaVO("QSoft"), "Tecnologia");
+        Empresa empresa = new Empresa(new EmpresaVO("Prisma"), "Tecnologia");
         Empresa outraEmpresa = new Empresa(new EmpresaVO("Outra"), "Servicos");
         Admin gestor = new Admin(
             "Ana Gestora", "12345678901", "ana@outra.com", 11999990001L, outraEmpresa,
@@ -123,7 +123,7 @@ class FuncionarioServiceTest {
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
             () -> service.create(new FuncionarioRequest(
-                "Carlos Silva", "52998224725", "carlos@qsoft.com", 11999990000L, "Analista",
+                "Carlos Silva", "52998224725", "carlos@prisma.com", 11999990000L, "Analista",
                 "Tecnologia", empresa.getId(), "Q001", "senha-segura", "ATIVO", gestor.getId()
             ))
         );

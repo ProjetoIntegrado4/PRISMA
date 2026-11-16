@@ -85,7 +85,7 @@ class CsvRepositoriesTest {
 
     @Test
     void empresaCadastradaNoSiteVaiParaOCsvComProximoCodigo() throws IOException {
-        Empresa nova = new Empresa(new EmpresaVO("QSoft"), new EmpresaDadosVO("Tecnologia", "QSoft Ltda",
+        Empresa nova = new Empresa(new EmpresaVO("Prisma"), new EmpresaDadosVO("Tecnologia", "Prisma Ltda",
                 "12345678000199", 25, "01310100", "Av. Paulista, 1000", "São Paulo", "SP", "Ana"));
 
         empresas.save(nova);
@@ -95,7 +95,7 @@ class CsvRepositoriesTest {
         assertEquals("company_id,company_name,industry,company_size,employee_count,razao_social,cnpj,cep,"
                 + "endereco,cidade,estado,admin_responsavel", linhas.get(0));
         assertEquals("C01,NexoCode Solucoes,Tecnologia,Grande,1450,,,,,,,", linhas.get(1));
-        assertEquals("C03,QSoft,Tecnologia,Pequena,25,QSoft Ltda,12345678000199,01310100,"
+        assertEquals("C03,Prisma,Tecnologia,Pequena,25,Prisma Ltda,12345678000199,01310100,"
                 + "\"Av. Paulista, 1000\",São Paulo,SP,Ana", linhas.get(3));
         Empresa relida = empresas.findById(nova.getId()).orElseThrow();
         assertEquals("Av. Paulista, 1000", relida.getEndereco());

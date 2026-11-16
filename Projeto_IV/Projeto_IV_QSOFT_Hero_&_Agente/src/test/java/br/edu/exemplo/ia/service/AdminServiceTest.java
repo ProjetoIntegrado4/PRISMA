@@ -30,7 +30,7 @@ class AdminServiceTest {
         AdminRepository adminRepository = mock(AdminRepository.class);
         EmpresaRepository empresaRepository = mock(EmpresaRepository.class);
 
-        Empresa empresa = new Empresa(new EmpresaVO("QSoft"), "Tecnologia");
+        Empresa empresa = new Empresa(new EmpresaVO("Prisma"), "Tecnologia");
         when(empresaRepository.findById(empresa.getId())).thenReturn(Optional.of(empresa));
         when(adminRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -39,10 +39,10 @@ class AdminServiceTest {
 
         assertEquals("Ana", response.nome());
         assertEquals("52998224725", response.cpf());
-        assertEquals("ana@qsoft.com", response.email());
+        assertEquals("ana@prisma.com", response.email());
         assertEquals(11999990000L, response.telefone());
         assertEquals(empresa.getId(), response.empresaId());
-        assertEquals("QSoft", response.empresaNome());
+        assertEquals("Prisma", response.empresaNome());
         assertEquals("Gestora", response.cargo());
         assertEquals("ATIVO", response.statusConta());
         assertEquals("ADMIN", response.nivelAcesso());
@@ -76,7 +76,7 @@ class AdminServiceTest {
         EmpresaRepository empresaRepository = mock(EmpresaRepository.class);
         AdminService service = new AdminService(adminRepository, empresaRepository);
         AdminRequest request = new AdminRequest(
-                "Ana", "52998224725", "ana@qsoft.com", 11999990000L, "Gestora",
+                "Ana", "52998224725", "ana@prisma.com", 11999990000L, "Gestora",
                 UUID.randomUUID(), "senha-segura", "senha-diferente", "ATIVO", "ADMIN"
         );
 
@@ -88,12 +88,12 @@ class AdminServiceTest {
     void deveRejeitarCpfSemOnzeDigitos() {
         AdminRepository adminRepository = mock(AdminRepository.class);
         EmpresaRepository empresaRepository = mock(EmpresaRepository.class);
-        Empresa empresa = new Empresa(new EmpresaVO("QSoft"), "Tecnologia");
+        Empresa empresa = new Empresa(new EmpresaVO("Prisma"), "Tecnologia");
         when(empresaRepository.findById(empresa.getId())).thenReturn(Optional.of(empresa));
         AdminService service = new AdminService(adminRepository, empresaRepository);
 
         AdminRequest request = new AdminRequest(
-                "Ana", "123.456", "ana@qsoft.com", 11999990000L, "Gestora",
+                "Ana", "123.456", "ana@prisma.com", 11999990000L, "Gestora",
                 empresa.getId(), "senha-segura", "senha-segura", "ATIVO", "ADMIN"
         );
 
@@ -106,12 +106,12 @@ class AdminServiceTest {
     void deveRejeitarEmailInvalido() {
         AdminRepository adminRepository = mock(AdminRepository.class);
         EmpresaRepository empresaRepository = mock(EmpresaRepository.class);
-        Empresa empresa = new Empresa(new EmpresaVO("QSoft"), "Tecnologia");
+        Empresa empresa = new Empresa(new EmpresaVO("Prisma"), "Tecnologia");
         when(empresaRepository.findById(empresa.getId())).thenReturn(Optional.of(empresa));
         AdminService service = new AdminService(adminRepository, empresaRepository);
 
         AdminRequest request = new AdminRequest(
-                "Ana", "529.982.247-25", "ana.qsoft.com", 11999990000L, "Gestora",
+                "Ana", "529.982.247-25", "ana.prisma.com", 11999990000L, "Gestora",
                 empresa.getId(), "senha-segura", "senha-segura", "ATIVO", "ADMIN"
         );
 
@@ -122,7 +122,7 @@ class AdminServiceTest {
 
     private AdminRequest request(UUID empresaId) {
         return new AdminRequest(
-                "Ana", "529.982.247-25", "ana@qsoft.com", 11999990000L, "Gestora",
+                "Ana", "529.982.247-25", "ana@prisma.com", 11999990000L, "Gestora",
                 empresaId, "senha-segura", "senha-segura", "ATIVO", "ADMIN"
         );
     }

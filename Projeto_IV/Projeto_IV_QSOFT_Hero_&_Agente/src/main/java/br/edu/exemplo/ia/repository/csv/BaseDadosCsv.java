@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** Pasta da base de dados em CSV (qsoft.dados.dir) e os arquivos usados pelos cadastros. */
+/** Pasta da base de dados em CSV (prisma.dados.dir) e os arquivos usados pelos cadastros. */
 @Component
 public class BaseDadosCsv {
     public static final String EMPRESAS = "companies.csv";

@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
  * </ul>
  *
  * <p>Roda depois da importação dos CSVs e só preenche tabela vazia, então nunca duplica nem apaga nada.
- * Desligue com QSOFT_DEMONSTRACAO=false.
+ * Desligue com PRISMA_DEMONSTRACAO=false.
  */
 @Component
 @Order(Ordered.LOWEST_PRECEDENCE)
@@ -67,7 +67,7 @@ public class DemonstracaoSeeder implements ApplicationRunner {
     private final BaseDadosCsv base;
     private final JdbcTemplate jdbc;
 
-    public DemonstracaoSeeder(@Value("${qsoft.demonstracao.popular:true}") boolean ativo,
+    public DemonstracaoSeeder(@Value("${prisma.demonstracao.popular:true}") boolean ativo,
                               EmpresaRepository empresas, FuncionarioRepository funcionarios,
                               PoliticaUsoRepository politicas, AceitePoliticaRepository aceites,
                               UsageRepository usos, PoliticaUseCase politicaUseCase, BaseDadosCsv base,

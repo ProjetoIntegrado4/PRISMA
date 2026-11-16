@@ -110,7 +110,7 @@ abstract class EstresseBase {
     HttpClient login() throws Exception {
         HttpClient cliente = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
         cliente.send(HttpRequest.newBuilder(URI.create(URL + "/api/auth/csrf")).build(), HttpResponse.BodyHandlers.discarding());
-        post(cliente, "/api/auth/login", "{\"usuario\":\"admin@qsoft.com\",\"senha\":\"Qsoft123!\"}");
+        post(cliente, "/api/auth/login", "{\"usuario\":\"admin@prisma.com\",\"senha\":\"Prisma123!\"}");
         return cliente;
     }
 

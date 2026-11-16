@@ -64,7 +64,7 @@ class UsageBloqueioPoliticaTest {
         politicas = new PoliticaService(politicaRepository, aceiteRepository, empresaRepository, funcionarioRepository);
         service = new UsageService(usageRepository, empresas, alerts, politicas);
 
-        empresa = new Empresa(new EmpresaVO("QSoft"), "Tecnologia");
+        empresa = new Empresa(new EmpresaVO("Prisma"), "Tecnologia");
         funcionario = new Funcionario("Ana Souza", empresa, "Analista");
         when(empresas.exists(empresa.getId())).thenReturn(true);
         when(empresaRepository.findById(empresa.getId())).thenReturn(Optional.of(empresa));

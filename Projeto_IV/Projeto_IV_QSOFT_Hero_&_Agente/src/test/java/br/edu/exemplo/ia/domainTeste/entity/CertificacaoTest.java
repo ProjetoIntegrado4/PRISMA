@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CertificacaoTest {
 
     private static Funcionario funcionario() {
-        return new Funcionario("Ana", new Empresa(new EmpresaVO("QSoft"), "Tecnologia"), "Analista");
+        return new Funcionario("Ana", new Empresa(new EmpresaVO("Prisma"), "Tecnologia"), "Analista");
     }
 
     @Test

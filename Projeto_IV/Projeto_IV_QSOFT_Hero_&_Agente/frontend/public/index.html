@@ -3,23 +3,24 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>QAIcontrol - Início</title>
+    <title>Prisma - Início</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
     <link rel="stylesheet" href="Estilo.css">
+    <link rel="icon" type="image/png" href="img/favicon.png">
 </head>
 <body class="landing">
 <nav class="top-nav" aria-label="Navegação principal">
-    <a class="brand" href="./index.html" aria-label="QAIcontrol, início">
-        <span class="brand-mark" aria-hidden="true">Q</span>
-        <span class="brand-name"><b>QAI</b>control</span>
+    <a class="brand" href="./index.html" aria-label="Prisma, início">
+        <img class="brand-logo" src="img/prisma-logo.png" alt="" aria-hidden="true">
+        <span class="brand-name"><b>Prisma</b></span>
     </a>
     <a class="active" href="./index.html" aria-current="page">Início</a>
-    <div class="nav-group">
+    <div class="nav-group" data-somente-admin>
         <button type="button" class="nav-trigger" aria-haspopup="true">Cadastros</button>
         <div class="nav-menu">
             <a href="./empresa.html">Empresas</a>
-            <a href="./admin.html">Administradores</a>
+            <a href="./admin.html">Administradores e gerentes</a>
             <a href="./funcionario.html">Funcionários</a>
             <a href="./capacitacao.html">Capacitações</a>
         </div>
@@ -37,7 +38,7 @@
 
 <main class="lp-hero">
     <div class="lp-copy">
-        <span class="lp-kicker">QSOFT · Gestão de inteligência artificial</span>
+        <span class="lp-kicker">Prisma · Gestão de inteligência artificial</span>
         <h1 class="lp-title">
             <span>Mais inteligência.</span>
             <span>Mais controle.</span>
@@ -46,15 +47,16 @@
         <p class="lp-lead">Entenda como a IA é usada na sua empresa. Conecte consumo, custos e produtividade em uma
             visão que coloca você no controle.</p>
         <div class="lp-actions">
-            <a class="lp-btn lp-btn-primary" href="./produtividade.html">Explorar indicadores <span aria-hidden="true">↗</span></a>
-            <a class="lp-btn lp-btn-ghost" href="./empresa.html">Gerenciar empresas <span aria-hidden="true">→</span></a>
+            <a class="lp-btn lp-btn-primary" href="./produtividade.html" data-somente-admin>Explorar indicadores <span aria-hidden="true">↗</span></a>
+            <a class="lp-btn lp-btn-ghost" href="./empresa.html" data-somente-admin>Gerenciar empresas <span aria-hidden="true">→</span></a>
+            <a class="lp-btn lp-btn-primary" href="./produtividade.html" data-somente-funcionario>Acessar Produtividade de IA <span aria-hidden="true">↗</span></a>
         </div>
         <p class="lp-note">Da adoção à governança, tudo começa com visibilidade.</p>
     </div>
 
     <figure class="lp-visual" aria-label="Ilustração: IA sob controle no centro, ligada a consumo, custos e produtividade">
         <div class="lp-visual-head">
-            <span class="lp-visual-brand">QAIcontrol</span>
+            <span class="lp-visual-brand">Prisma</span>
             <span class="lp-tag">Visão integrada</span>
         </div>
         <div class="lp-orbit" aria-hidden="true">
@@ -74,7 +76,7 @@
     </figure>
 </main>
 
-<section class="lp-pillars" aria-label="O que o QAIcontrol oferece">
+<section class="lp-pillars" aria-label="O que o Prisma oferece">
     <article>
         <span class="eyebrow">01 / Visibilidade</span>
         <h2>Saiba onde a IA faz parte.</h2>
@@ -93,8 +95,8 @@
 </section>
 
 <footer class="site-footer">
-    <span><b>QAIcontrol</b> <span class="sep">/</span> Uma visão clara do seu ecossistema de IA.</span>
-    <span>Desenvolvido com QSOFT · Projeto Integrado IV</span>
+    <span><b>Prisma</b> <span class="sep">/</span> Uma visão clara do seu ecossistema de IA.</span>
+    <span>Desenvolvido com Prisma · Projeto Integrado IV</span>
 </footer>
 <script src="./auth.js"></script>
 </body>

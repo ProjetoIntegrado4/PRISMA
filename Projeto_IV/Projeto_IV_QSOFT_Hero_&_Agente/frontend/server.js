@@ -6,6 +6,9 @@ const API = process.env.API_BASE_URL || 'http://localhost:8080';
 
 app.use(express.json());
 
+const PAGINAS_SO_ADMIN = ['/empresa.html', '/admin.html', '/funcionario.html', '/capacitacao.html'];
+const PERFIS_GESTAO = ['ADMIN', 'GERENTE'];
+
 app.use(async (req, res, next) => {
     if ((!req.path.endsWith('.html') && req.path !== '/') || req.path === '/login.html') return next();
 
@@ -14,6 +17,9 @@ app.use(async (req, res, next) => {
             headers: {Cookie: req.headers.cookie || ''}
         });
         if (!response.ok) return res.redirect('/login.html');
+        // Cadastros são só da gestão (administrador e gerente); o funcionário volta para o Início.
+        const usuario = await response.json().catch(() => ({}));
+        if (!PERFIS_GESTAO.includes(usuario.perfil) && PAGINAS_SO_ADMIN.includes(req.path)) return res.redirect('/index.html');
         next();
     } catch (_err) {
         res.redirect('/login.html');

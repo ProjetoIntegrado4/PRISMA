@@ -44,10 +44,10 @@ class AuthControllerTest {
     void loginDeveRepassarUsuarioESenha() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
-        AuthResponse esperado = new AuthResponse("Administrador", "admin@qsoft.com", "ADMIN");
-        when(auth.login("admin@qsoft.com", "Qsoft123!", request, response)).thenReturn(esperado);
+        AuthResponse esperado = new AuthResponse("Administrador", "admin@prisma.com", "ADMIN");
+        when(auth.login("admin@prisma.com", "Prisma123!", request, response)).thenReturn(esperado);
 
-        AuthResponse resultado = controller.login(new AuthRequest("admin@qsoft.com", "Qsoft123!"), request, response);
+        AuthResponse resultado = controller.login(new AuthRequest("admin@prisma.com", "Prisma123!"), request, response);
 
         assertSame(esperado, resultado);
     }

@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /** Aceite de política de uso de IA (US PP-21, RF15/RN15/RD07). */
 class AceitePoliticaTest {
 
-    private final Empresa empresa = new Empresa(new EmpresaVO("QSoft"), "Tecnologia");
+    private final Empresa empresa = new Empresa(new EmpresaVO("Prisma"), "Tecnologia");
     private final Funcionario funcionario = new Funcionario("Ana Souza", empresa, "Analista");
     private final PoliticaUso politica = new PoliticaUso(empresa, "Uso de IA", "Texto", true);
 
