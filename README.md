@@ -1,4 +1,4 @@
-# 🤖 QAI Control
+# 🤖 PRISMA
 
 > Plataforma de Governança, Monitoramento e Análise do Uso de Inteligência Artificial nas Organizações.
 
@@ -8,7 +8,7 @@ Projeto desenvolvido durante o **Projeto Integrado IV – Ciência de Dados e Ne
 
 ## 📌 Sobre o projeto
 
-O **QAI Control** é uma plataforma web criada para auxiliar empresas a monitorar e compreender como ferramentas de Inteligência Artificial estão sendo utilizadas dentro da organização.
+O **PRISMA** é uma plataforma web criada para auxiliar empresas a monitorar e compreender como ferramentas de Inteligência Artificial estão sendo utilizadas dentro da organização.
 
 A solução centraliza dados relacionados ao uso de IA e os transforma em indicadores que auxiliam gestores na análise de:
 
