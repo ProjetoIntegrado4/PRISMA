@@ -68,6 +68,33 @@ def options(company=None):
     return result
 
 
+# Cargo (normalizado, sem acento e sem "(a)") -> cursos tematicamente pertinentes.
+# Indica oportunidade temática do cargo, nunca deficiência.
+ROLE_RULES = [
+    ("CSV08", ("desenvolv", "developer", "engenheiro de software", "programador", "devops", "engenheiro de testes", " qa ")),
+    ("CSV11", ("dados", "data analyst", "data scientist", "financeir", "controller", "contas a pagar", "contas a receber",
+               "contab", "fiscal", "supply chain", "compras", "logistica", "planejamento", "bi ")),
+    ("CSV12", ("comercial", "vendas", "vendedor", "sales", "executivo de contas", "relacionamento com cliente",
+               "produtos bancarios", "atendimento", "caixa", "loja", "marketing")),
+    ("CSV05", ("gerente", "gestor", "diretor", "manager", "coordenador", "supervisor", "lider", "head", "business partner")),
+    ("CSV10", ("operac", "operador", "producao", "tecnico", "logistica", "suporte", "infraestrutura", "administrador de sistemas",
+               "processos", " qa ", "testes", "caixa", "atendimento", "compras", "contas a pagar")),
+    ("CSV03", ("infraestrutura", "administrador de sistemas", "seguranca", "suporte", "redes")),
+    ("CSV04", (" rh ", "recrut", "recursos humanos", "pessoas", "juridico", "advogado", "dpo", "privacidade")),
+]
+# Categoria da ferramenta em ai_tools.csv -> cursos ligados ao uso registrado.
+TOOL_CATEGORY_RULES = {
+    "assistente generativo": ("CSV09",),
+    "copiloto de desenvolvimento": ("CSV08",),
+    "ia integrada a produtividade": ("CSV10",),
+    "plataforma corporativa de ia": ("CSV10", "CSV04"),
+    "api de modelo": ("CSV10", "CSV04"),
+}
+TOOL_NAME_RULES = {"chatgpt enterprise": "CSV06", "microsoft 365 copilot": "CSV07"}
+# Trilha básica: oferecida quando os dados do colaborador geram menos de 3 cursos específicos.
+BASIC_TRACK = ("CSV01", "CSV09", "CSV02")
+
+
 def profile(company, employee, interest=None, today=None):
     today = today or date.today()
     people = [e for e in rows("employees") if e["company_id"] == company and e["employee_id"] == employee]
@@ -95,8 +122,9 @@ def profile(company, employee, interest=None, today=None):
     start = end - timedelta(days=89)
     usage = [r for r in all_usage if r["employee_id"] == employee and start <= day(r["timestamp"]) <= end
              and norm(r.get("request_status")) == "success"]
-    tools = {r["ai_tool_id"]: r.get("tool_name", "") for r in rows("ai_tools", False)}
-    tool_names = sorted({tools.get(r["ai_tool_id"], r["ai_tool_id"]) for r in usage})
+    tool_rows = {r["ai_tool_id"]: r for r in rows("ai_tools", False)}
+    used_tools = sorted({r["ai_tool_id"] for r in usage})
+    tool_names = sorted({tool_rows.get(t, {}).get("tool_name") or t for t in used_tools})
     events = [r for r in rows("security_events", False) if r["company_id"] == company
               and r["employee_id"] == employee and day(r.get("timestamp"))
               and start <= day(r["timestamp"]) <= end]
@@ -119,16 +147,16 @@ def profile(company, employee, interest=None, today=None):
     if interest:
         add(interest, "interest", "Interesse de capacitação informado explicitamente nesta solicitação: " +
             next(c["name"] for c in CATALOG if c["id"] == interest))
-    role = norm(person.get("job_role")).replace("(a)", "")
-    for cid, terms in [("CSV08", ("desenvolv", "developer", "engenheiro de software", "programador")),
-                       ("CSV11", ("dados", "data analyst", "data scientist")),
-                       ("CSV12", ("comercial", "vendas", "sales")),
-                       ("CSV05", ("gerente", "gestor", "diretor", "manager", "coordenador"))]:
+    role = " " + norm(person.get("job_role")).replace("(a)", "").replace("  ", " ") + " "
+    for cid, terms in ROLE_RULES:
         if any(t in role for t in terms):
             add(cid, "role", evidence[0]["text"])
-    for cid, term in [("CSV06", "chatgpt enterprise"), ("CSV07", "microsoft 365 copilot"), ("CSV08", "github copilot")]:
-        if any(term in norm(t) for t in tool_names):
-            add(cid, "tool:" + cid, "Uso registrado da ferramenta " + term + "; oportunidade de capacitação, sem inferir dificuldade.")
+    for tid in used_tools:
+        tool = tool_rows.get(tid, {})
+        name, category = tool.get("tool_name") or tid, norm(tool.get("tool_category"))
+        text = f"Uso registrado da ferramenta {name} na janela; oportunidade de capacitação, sem inferir dificuldade."
+        for cid in TOOL_CATEGORY_RULES.get(category, ()) + ((TOOL_NAME_RULES[norm(name)],) if norm(name) in TOOL_NAME_RULES else ()):
+            add(cid, "tool:" + tid, text)
     if events:
         text = f"{len(events)} eventos de segurança vinculados ao colaborador na janela; não comprovam culpa ou falta de competência."
         for cid in ("CSV02", "CSV03"):
@@ -136,10 +164,17 @@ def profile(company, employee, interest=None, today=None):
         if any(any(t in norm(e.get("event_type")) for t in ("lgpd", "dados pessoais", "privacidade")) for e in events):
             add("CSV04", "privacy", "Há evento individual que menciona dados pessoais, privacidade ou LGPD.")
     catalog_names = {norm(r.get("course_name")) for r in rows("training_records")}
-    candidates = [dict(c, evidence_ids=reasons[c["id"]],
-                       action="retomar_matricula" if norm(c["name"]) in pending else "conhecer_curso")
-                  for c in CATALOG if c["id"] in reasons and norm(c["name"]) not in completed
-                  and norm(c["name"]) in catalog_names]
+    def eligible():
+        return [dict(c, evidence_ids=reasons[c["id"]],
+                     action="retomar_matricula" if norm(c["name"]) in pending else "conhecer_curso")
+                for c in CATALOG if c["id"] in reasons and norm(c["name"]) not in completed
+                and norm(c["name"]) in catalog_names]
+    candidates = eligible()
+    if len(candidates) < 3:
+        for cid in BASIC_TRACK:
+            add(cid, "basic", "Trilha básica: não há conclusão registrada deste curso de base no histórico de capacitação; "
+                "é um ponto de partida, não indica falta de conhecimento.")
+        candidates = eligible()
     return {"company_id": company, "employee_id": employee, "role": person.get("job_role", ""),
             "window": {"start": str(start), "end": str(end), "basis": "Última data válida de uso da empresa, limitada a hoje"},
             "successful_requests": sum(counts), "tools": tool_names, "valid_completed_courses": len(completed),

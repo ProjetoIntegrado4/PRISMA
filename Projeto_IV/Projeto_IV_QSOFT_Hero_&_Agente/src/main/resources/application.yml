@@ -1,4 +1,23 @@
 spring:
+  # Agente de capacitação (gabarito A4): Spring AI com OpenAI. A chave vem só do .env (OPENAI_API_KEY);
+  # sem chave o backend sobe normalmente e o agente avisa que falta configurar.
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:sem-chave-configurada}
+      chat:
+        options:
+          model: ${OPENAI_MODEL:gpt-4o-mini}
+          temperature: 0.2
+      embedding:
+        options:
+          model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+    model:
+      image: none
+      audio:
+        speech: none
+        transcription: none
+      moderation: none
+
   application:
     name: prisma-ia-backend
   config:
@@ -23,11 +42,22 @@ spring:
 # da raiz do projeto; o painel de produtividade lê a mesma pasta.
 prisma:
   dados:
-    dir: ${PRISMA_DADOS_DIR:dados/csv}
+    dir: ${PRISMA_DADOS_DIR:dados/csv_preenchidos}
   # Carga de demonstração (service/demonstracao/DemonstracaoSeeder): políticas, aceites e consumo de IA,
   # derivados da base de dados. Só preenche tabela vazia. Desligue com PRISMA_DEMONSTRACAO=false.
   demonstracao:
     popular: ${PRISMA_DEMONSTRACAO:true}
+
+agente:
+  # Serviço Python (perfil a partir dos CSVs e ML) e serviço RAGAS (métricas), ambos FastAPI.
+  ai-service-url: ${AI_SERVICE_URL:http://localhost:8000}
+  ragas-service-url: ${RAGAS_SERVICE_URL:http://localhost:8001}
+  internal-token: ${AI_INTERNAL_TOKEN:}
+  # Banco vetorial (pgvector) do agente: tabela course_embeddings e recomendações geradas.
+  vetor:
+    url: ${AI_VECTOR_DB_URL:jdbc:postgresql://localhost:5433/qai_ai}
+    usuario: ${AI_VECTOR_DB_USER:qai_ai}
+    senha: ${AI_DB_PASSWORD:}
 
 services:
   alert:

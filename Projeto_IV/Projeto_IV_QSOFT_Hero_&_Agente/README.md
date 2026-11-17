@@ -67,7 +67,7 @@ PRISMA_DADOS_DIR=C:/caminho/da/nova/pasta
 ```
 
 Depois, reinicie o backend: `docker compose up -d --force-recreate backend`. Sem `.env`, o padrão é
-`dados/csv`. O painel de produtividade importa os CSVs da mesma pasta.
+`dados/csv_preenchidos`. O painel de produtividade importa os CSVs da mesma pasta.
 
 ## Subir pelo Docker
 
@@ -176,7 +176,7 @@ A tela mostra o custo total, os usos cobrados, agentes × uso direto, os usos se
 colaborador (os de maior custo) e ferramenta, e a memória de cálculo (versão da regra, vigência e fórmula).
 Se o período não tiver uso, o total é 0 e aparece "Nenhum uso de IA registrado no período selecionado".
 
-Os dados vêm das tabelas analíticas importadas de `dados/csv` (`ai_usage_logs`, `ai_models`, `companies`,
+Os dados vêm das tabelas analíticas importadas de `dados/csv_preenchidos` (`ai_usage_logs`, `ai_models`, `companies`,
 `departments`, `employees`, `ai_tools`), com ids como `C01`, `C01-D02` e `C01-E0001`. Elas **não** são as entidades
 Empresa/Funcionario (UUID) do CRUD. As tabelas `uso_custo` (ai_usage_logs com `model_id` e `application`) e `modelos`
 (ai_models) foram acrescentadas ao `produtividade.yml`; as demais reaproveitam o mapeamento do painel.

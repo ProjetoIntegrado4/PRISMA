@@ -9,7 +9,3 @@ services:
     container_name: prisma-integrado-backend
   frontend:
     container_name: prisma-integrado-frontend
-volumes:
-  ollama_data:
-    external: true
-    name: qaicontrol-agente_ollama_data

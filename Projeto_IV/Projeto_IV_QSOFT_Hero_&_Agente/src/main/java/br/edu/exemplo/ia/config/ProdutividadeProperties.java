@@ -20,7 +20,7 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "produtividade")
 public record ProdutividadeProperties(
         @DefaultValue("public") String schema,
-        @DefaultValue("dados/csv") String csvDir,
+        @DefaultValue("dados/csv_preenchidos") String csvDir,
         @DefaultValue("90") int janelaRecenteDias,
         @DefaultValue("12") int limiteRanking,
         @DefaultValue("") String centroCustoPrefixo,

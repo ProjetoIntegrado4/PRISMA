@@ -8,7 +8,7 @@ produtividade:
   schema: public
   # Pasta dos CSVs importados na subida quando a tabela não existe ou está vazia.
   # É a mesma base de dados dos cadastros (PRISMA_DADOS_DIR, no .env); PRODUTIVIDADE_CSV_DIR só se quiser outra.
-  csv-dir: ${PRODUTIVIDADE_CSV_DIR:${PRISMA_DADOS_DIR:dados/csv}}
+  csv-dir: ${PRODUTIVIDADE_CSV_DIR:${PRISMA_DADOS_DIR:dados/csv_preenchidos}}
   # Janela, em dias, usada em "licenças ociosas" e "colaboradores mais ativos".
   janela-recente-dias: 90
   # Quantos colaboradores aparecem no ranking.

@@ -1,12 +1,17 @@
+"""API FastAPI do agente: perfil observado (CSVs da base), ML (regressão logística) e producer do RabbitMQ."""
 from contextlib import asynccontextmanager
 import hmac
+import json
 import os
 from uuid import UUID
+import pika
 from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 import store
 import domain
+
+TRAINING_QUEUE = "ml.training.requests"
 
 
 @asynccontextmanager
@@ -48,25 +53,15 @@ class ProfileRequest(BaseModel):
     assessment: Scores | None = None
 
 
-class EvaluationRequest(BaseModel):
-    recommendation_id: UUID
-    reference: str = Field(default="", max_length=6000)
+class TrainingRequest(BaseModel):
+    seed: int = Field(default=42, ge=0, le=2**31 - 1)
 
 
 @app.get("/health")
 def health():
     with store.connect() as db:
         db.execute("SELECT 1")
-    from local_llm import BASE, MODEL, EMBEDDING_MODEL
-    import httpx
-    try:
-        response = httpx.get(BASE + '/api/tags', timeout=5)
-        response.raise_for_status()
-        models = [m['name'] for m in response.json().get('models', [])]
-    except Exception:
-        models = []
-    return {"status": "ok", "provider": "ollama_local", "model": MODEL,
-            "local_ready": MODEL in models and EMBEDDING_MODEL in models}
+    return {"status": "ok"}
 
 
 @app.get("/options")
@@ -83,34 +78,36 @@ def profile(request: ProfileRequest):
     return observed
 
 
-@app.post("/recommend")
-def recommend(request: ProfileRequest):
-    from rag import recommend as generate
-    return generate(profile(request))
-
-
 @app.post("/predict")
 def predict(request: Scores):
+    """Previsão síncrona (REST): não passa pelo RabbitMQ."""
     from ml import predict as classify
     return classify(request.model_dump())
 
 
+def publish_training(seed=42):
+    """Producer: publica uma solicitação de treino no RabbitMQ, sem treinar dentro da API."""
+    job = store.new_job("train", {"seed": seed}, status="queued")
+    jid = job["id"]
+    try:
+        params = pika.URLParameters(os.environ["RABBITMQ_URL"])
+        params.blocked_connection_timeout = 10
+        with pika.BlockingConnection(params) as conn:
+            ch = conn.channel()
+            ch.queue_declare(queue=TRAINING_QUEUE, durable=True)
+            ch.basic_publish(exchange="", routing_key=TRAINING_QUEUE,
+                             body=json.dumps({"job_id": jid, "seed": seed}),
+                             properties=pika.BasicProperties(delivery_mode=2, content_type="application/json"))
+    except Exception:
+        store.update_job(jid, "failed", error="RabbitMQ indisponível: a solicitação de treino não foi publicada.")
+        raise
+    return job
+
+
 @app.post("/training/jobs", status_code=202)
-def training():
-    return store.new_job("train", {})
-
-
-@app.post("/index/jobs", status_code=202)
-def index():
-    return store.new_job("index", {})
-
-
-@app.post("/evaluation/jobs", status_code=202)
-def evaluation(request: EvaluationRequest):
-    record = store.recommendation(str(request.recommendation_id))
-    if record["status"] != "generated":
-        raise ValueError("A recomendação precisa ter sido gerada pela IA.")
-    return store.new_job("evaluate", request.model_dump(mode="json"))
+def training(request: TrainingRequest | None = None):
+    """Treino assíncrono: responde 202 sem aguardar; o worker consome a fila e treina."""
+    return publish_training((request or TrainingRequest()).seed)
 
 
 @app.get("/jobs/{job_id}")

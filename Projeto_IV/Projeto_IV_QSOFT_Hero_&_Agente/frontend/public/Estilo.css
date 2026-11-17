@@ -513,3 +513,111 @@ details.detalhe > summary { cursor: pointer; font: 600 .9rem var(--f-body); colo
 details.detalhe > summary::before { content: "▸ "; }
 details.detalhe[open] > summary::before { content: "▾ "; }
 details.detalhe > summary::-webkit-details-marker { display: none }
+
+
+.agent-output { white-space: pre-wrap;overflow-wrap: anywhere}
+.agent-note {padding: 16px; border-left: 4px solid #397c80; background: #edf7f6; color: #143d40}
+label {display: block; margin: 12px 0 5px}
+select, textarea {max-width: 100%; width: 100%}
+button {margin: 8px 8px 8px 0}
+.agent-grid {display: grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap: 20px}
+progress {width: 100%}
+#jobs li {padding: 8px}
+details {margin: 16px 0}
+summary {cursor: pointer}
+main {max-width: 1200px;margin: auto;padding: 24px;}
+
+/* ===== Avaliações RAGAS (avaliacao.html) ===== */
+.avaliacao-lista { display: grid; gap: 12px }
+.avaliacao-card { border: 1px solid var(--line); border-radius: var(--r); padding: 14px; display: grid; gap: 8px; background: var(--surface) }
+.avaliacao-card h3 { margin: 0; font: 600 1rem var(--f-display) }
+.avaliacao-metrica { display: grid; grid-template-columns: minmax(0, 14rem) 1fr 6rem; gap: 10px; align-items: center; font-size: .9rem }
+.avaliacao-metrica b { font: 500 .85rem var(--f-mono); text-align: right }
+.avaliacao-trilho { height: 10px; background: var(--surface-2); border-radius: 999px; overflow: hidden }
+.avaliacao-barra { height: 100%; background: var(--accent); border-radius: 999px }
+@media (max-width: 640px) { .avaliacao-metrica { grid-template-columns: 1fr 4.5rem } .avaliacao-trilho { grid-column: 1 / -1; grid-row: 2 } }
+
+/* ------------------------------------------------------------------------------------------------
+   Agente de capacitação (agente.html e avaliacao.html): bloco só dessas páginas (escopo body.agente-page).
+   Neutraliza as regras genéricas do agente acima (label, button, details, main) apenas nelas.
+   ------------------------------------------------------------------------------------------------ */
+
+/* Estrutura: o <main> se comporta como o body das outras páginas */
+.agente-page main { max-width: none; margin: 0; padding: 0; display: grid; gap: 22px; align-content: start; min-width: 0 }
+.agente-page main p { margin: 0 }
+
+/* Cabeçalho da página */
+.agente-topo { display: grid; gap: 8px; padding-block: 12px 20px; border-bottom: 1px solid var(--line) }
+.agente-lead { color: var(--ink-2); max-width: 80ch }
+.agente-status { display: inline-flex; align-items: center; gap: 8px; width: fit-content; margin-top: 4px !important;
+  font: 500 .78rem/1.2 var(--f-mono); color: var(--ink-2); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 99px; padding: 6px 12px }
+.agente-status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none }
+
+/* Grade com os dois painéis principais */
+.agente-page .agent-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 14px; align-items: start }
+@media (max-width: 900px) { .agente-page .agent-grid { grid-template-columns: minmax(0, 1fr) } }
+
+.agente-painel { gap: 16px; padding: 20px }
+.agente-cab { display: grid; gap: 6px; min-width: 0 }
+.agente-cab .note { margin: 0 }
+
+/* Rótulos e campos no padrão dos filtros (.ctl) */
+.agente-page label { display: block; margin: 0 }
+.agente-page .ctl label { font: 500 .72rem/1.2 var(--f-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3) }
+.agente-campos { display: grid; gap: 14px }
+.agente-page .ctl select, .agente-page .ctl input, .agente-page .ctl textarea { width: 100%; min-width: 0 }
+.agente-page textarea { min-height: 7em }
+
+/* Botões: tamanho natural, lado a lado, sem a margem genérica */
+.agente-page main button { margin: 0 }
+.agente-acoes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.agente-page .secondary-button:disabled { opacity: .6; cursor: progress }
+
+/* Mensagem de andamento ou erro */
+.agente-page .message:empty { display: none }
+
+/* Áreas de saída (perfil, recomendação, classificação) */
+.agente-saida { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: 8px; padding: 14px 16px; font-size: .93rem; line-height: 1.55; color: var(--ink) }
+.agente-saida:empty { display: none }
+.agente-recomendacao { min-height: 160px; color: var(--ink-2); border-left: 4px solid var(--accent) }
+
+/* Aviso de uso responsável: mesmo tom do callout, seguindo o tema */
+.agente-page .agent-note { margin: 0; padding: 10px 14px; border: 1px solid var(--line); border-left: 4px solid var(--warn);
+  border-radius: 6px; background: var(--surface); color: var(--ink-2); font-size: .88rem }
+
+/* Seções recolhíveis */
+.agente-page details { margin: 0 }
+.agente-details { border-top: 1px solid var(--line); padding-top: 12px }
+.agente-details > summary { cursor: pointer; list-style: none; font: 600 .9rem var(--f-body); color: var(--accent); width: fit-content }
+.agente-details > summary::-webkit-details-marker { display: none }
+.agente-details > summary::before { content: "▸ " }
+.agente-details[open] > summary::before { content: "▾ " }
+.agente-details-corpo { display: grid; gap: 14px; margin-top: 14px }
+.agente-details-secao { border-top: 0; padding-top: 0 }
+.agente-details-secao > summary { font: 600 1.05rem var(--f-display); color: var(--ink) }
+.agente-details-secao > summary::before { color: var(--accent) }
+
+/* Notas da avaliação real */
+.agente-check { display: inline-flex !important; align-items: center; gap: 8px; font-size: .92rem; color: var(--ink-2); cursor: pointer }
+.agente-check input { width: 16px; height: 16px; accent-color: var(--accent) }
+#scores { display: grid; gap: 14px }
+.agente-notas { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px }
+
+/* Métricas da avaliação (RAGAS) */
+.agente-metricas { display: grid; gap: 6px }
+.agente-metricas:empty { display: none }
+.agente-metricas p { font: 500 .8rem var(--f-mono); color: var(--ink-2) }
+.agente-page progress { width: 100%; height: 8px; accent-color: var(--accent) }
+
+/* Processamentos */
+.agente-jobs { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px }
+.agente-page #jobs li { padding: 10px 14px; background: var(--surface-2); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+  border-radius: 6px; font: 12.5px/1.5 var(--f-mono); color: var(--ink-2); white-space: pre-wrap; overflow-wrap: anywhere }
+.agente-jobs:empty::before { content: "Nenhum processamento iniciado nesta sessão."; display: block; padding: 10px 14px;
+  border: 1px dashed var(--line); border-radius: 6px; color: var(--ink-3); font-size: .88rem }
+
+/* Catálogo */
+.agente-catalogo { display: grid; gap: 8px; margin-top: 12px }
+.agente-catalogo p { padding: 10px 14px; background: var(--surface-2); border-radius: 6px; font-size: .88rem; color: var(--ink-2) }

@@ -1,35 +1,162 @@
 <!doctype html>
 <html lang="pt-BR">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Prisma | Orientação de capacitação</title><link rel="stylesheet" href="Estilo.css">
-<style>.agent-output{white-space:pre-wrap;overflow-wrap:anywhere}.agent-note{padding:16px;border-left:4px solid #397c80;background:#edf7f6;color:#143d40}label{display:block;margin:12px 0 5px}select,textarea{max-width:100%;width:100%}button{margin:8px 8px 8px 0}.agent-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}progress{width:100%}#jobs li{padding:8px}details{margin:16px 0}summary{cursor:pointer}main{max-width:1200px;margin:auto;padding:24px}</style>
-</head><body>
-<nav class="top-nav" aria-label="Navegação principal"><a href="index.html">Início</a><a href="capacitacao.html">Capacitações</a><a href="produtividade.html">Produtividade IA</a><a href="agente.html" class="active">Agente de capacitação</a></nav>
-<main><h1>Orientação de capacitação</h1>
-<p>Um curso pertinente ao contexto do colaborador, com justificativa e evidências. Revise a recomendação antes de decidir.</p>
-<p id="service" role="status">Verificando disponibilidade…</p>
-<div class="agent-grid"><section><h2>Perfil observado</h2>
-<label for="company">Empresa</label><select id="company"><option value="">Selecione</option></select>
-<label for="employee">Colaborador</label><select id="employee" disabled><option value="">Selecione a empresa</option></select>
-<label for="interest">Interesse declarado pelo colaborador (opcional)</label><select id="interest"><option value="">Usar apenas os registros disponíveis</option></select>
-<button id="inspect">Consultar perfil</button><button id="recommend">Recomendar um curso</button>
-<p id="message" role="status" aria-live="polite"></p><div id="profile" class="agent-output"></div>
-</section><section><h2>Recomendação</h2><div id="recommendation" class="agent-output">Selecione um colaborador para começar.</div>
-<p class="agent-note">Volume de uso não mede competência. Eventos de segurança não comprovam culpa. Dados contraditórios são sinalizados e desconsiderados.</p>
-<details><summary>Avaliar a resposta gerada</summary><p>A avaliação usa o modelo local e pode demorar. Mede a resposta, não a pessoa.</p>
-<label for="reference">Resposta de referência revisada por uma pessoa (opcional)</label><textarea id="reference" rows="4" maxlength="6000"></textarea>
-<button id="evaluate" disabled>Avaliar com RAGAS</button><div id="metrics"></div></details>
-</section></div>
-<section><details><summary>Classificação opcional por avaliações reais</summary><h2>Classificação por avaliações reais</h2><p>Informe as notas de uma avaliação específica de IA. Não use volume de chamadas, cargo ou ausência de cursos como substitutos dessas notas.</p>
-<p class="agent-note">Sem avaliações reais para treinamento, o ML permanece sem modelo. Não usamos dados sintéticos para classificar colaboradores.</p>
-<label><input id="use-assessment" type="checkbox"> Incluir estas notas reais na análise para recomendação</label>
-<form id="scores"><div class="agent-grid">
-<div><label for="fundamentos">Fundamentos (0 a 100)</label><input id="fundamentos" type="number" min="0" max="100" step="any" required></div>
-<div><label for="verificacao">Verificação de respostas (0 a 100)</label><input id="verificacao" type="number" min="0" max="100" step="any" required></div>
-<div><label for="aplicacao">Aplicação prática (0 a 100)</label><input id="aplicacao" type="number" min="0" max="100" step="any" required></div>
-</div><button type="submit">Consultar classificação</button></form><div id="prediction" class="agent-output"></div></details></section>
-<section><h2>Preparação e acompanhamento</h2><p>Indexe o catálogo antes da primeira recomendação e após alterações nos critérios. O treinamento exige o arquivo de avaliações reais descrito no manual do projeto.</p>
-<button id="index">Indexar catálogo</button><button id="train">Treinar com avaliações reais</button>
-<h3>Processamentos</h3><ul id="jobs"></ul>
-<details><summary>Catálogo e critérios de indicação</summary><div id="catalog"></div></details>
-</section></main><script src="auth.js"></script><script src="agente.js"></script></body></html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Prisma - Agente de capacitação</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+    <link rel="stylesheet" href="Estilo.css">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+</head>
+<body class="agente-page">
+<nav class="top-nav" aria-label="Navegação principal">
+    <a class="brand" href="./index.html" aria-label="Prisma, início">
+        <img class="brand-logo" src="img/prisma-logo.png" alt="" aria-hidden="true">
+        <span class="brand-name"><b>Prisma</b></span>
+    </a>
+    <a href="./index.html">Início</a>
+    <div class="nav-group" data-somente-admin>
+        <button type="button" class="nav-trigger" aria-haspopup="true">Cadastros</button>
+        <div class="nav-menu">
+            <a href="./empresa.html">Empresas</a>
+            <a href="./admin.html">Administradores e gerentes</a>
+            <a href="./funcionario.html">Funcionários</a>
+            <a href="./capacitacao.html">Capacitações</a>
+        </div>
+    </div>
+    <div class="nav-group">
+        <button type="button" class="nav-trigger" aria-haspopup="true">Monitoramento</button>
+        <div class="nav-menu">
+            <a href="./consumo.html">Consumo de IA</a>
+            <a href="./produtividade.html">Produtividade de IA</a>
+            <a href="./custos.html">Custos de IA</a>
+        </div>
+    </div>
+    <a href="./governanca.html">Governança</a>
+    <a class="active" aria-current="page" href="./agente.html" data-somente-admin>Agente de capacitação</a>
+</nav>
+
+<main>
+    <header class="agente-topo">
+        <span class="eyebrow">Agente de capacitação · Spring AI + OpenAI</span>
+        <h1>Orientação de capacitação</h1>
+        <p class="agente-lead">Até três cursos pertinentes ao contexto do colaborador, com justificativa e evidências. Revise a
+            recomendação antes de decidir.</p>
+        <p id="service" class="agente-status" role="status">Verificando disponibilidade…</p>
+    </header>
+
+    <div class="agent-grid">
+        <section class="panel agente-painel" aria-labelledby="h-perfil">
+            <div class="agente-cab">
+                <span class="eyebrow">Etapa 1</span>
+                <h2 id="h-perfil">Perfil observado</h2>
+                <p class="note">Escolha a empresa e o colaborador. O interesse declarado é opcional.</p>
+            </div>
+            <div class="agente-campos">
+                <div class="ctl">
+                    <label for="company">Empresa</label>
+                    <select id="company">
+                        <option value="">Selecione</option>
+                    </select>
+                </div>
+                <div class="ctl">
+                    <label for="employee">Colaborador</label>
+                    <select id="employee" disabled>
+                        <option value="">Selecione a empresa</option>
+                    </select>
+                </div>
+                <div class="ctl">
+                    <label for="interest">Interesse declarado pelo colaborador (opcional)</label>
+                    <select id="interest">
+                        <option value="">Usar apenas os registros disponíveis</option>
+                    </select>
+                </div>
+            </div>
+            <div class="agente-acoes">
+                <button id="recommend">Recomendar cursos</button>
+                <button id="inspect" class="secondary-button">Consultar perfil</button>
+            </div>
+            <p id="message" class="message" role="status" aria-live="polite"></p>
+            <div id="profile" class="agent-output agente-saida"></div>
+        </section>
+
+        <section class="panel agente-painel" aria-labelledby="h-recomendacao">
+            <div class="agente-cab">
+                <span class="eyebrow">Etapa 2</span>
+                <h2 id="h-recomendacao">Recomendação</h2>
+            </div>
+            <div id="recommendation" class="agent-output agente-saida agente-recomendacao">Selecione um colaborador para começar.</div>
+            <p class="agent-note">Volume de uso não mede competência. Eventos de segurança não comprovam culpa. Dados
+                contraditórios são sinalizados e desconsiderados.</p>
+            <details class="agente-details">
+                <summary>Avaliar a resposta gerada</summary>
+                <div class="agente-details-corpo">
+                    <p class="note">A avaliação RAGAS usa a OpenAI e pode demorar. Mede a resposta, não a pessoa. <a href="./avaliacao.html">Ver todas as avaliações</a></p>
+                    <div class="ctl">
+                        <label for="reference">Resposta de referência revisada por uma pessoa (opcional)</label>
+                        <textarea id="reference" rows="4" maxlength="6000"></textarea>
+                    </div>
+                    <div class="agente-acoes">
+                        <button id="evaluate" disabled>Avaliar com RAGAS</button>
+                    </div>
+                    <div id="metrics" class="agente-metricas"></div>
+                </div>
+            </details>
+        </section>
+    </div>
+
+    <section class="panel agente-painel" aria-label="Classificação por avaliações reais">
+        <details class="agente-details agente-details-secao">
+            <summary>Classificação opcional por avaliações reais</summary>
+            <div class="agente-details-corpo">
+                <h2>Classificação por avaliações reais</h2>
+                <p class="note">Informe as notas de uma avaliação específica de IA. Não use volume de chamadas, cargo ou
+                    ausência de cursos como substitutos dessas notas.</p>
+                <p class="agent-note">Sem avaliações reais para treinamento, o ML permanece sem modelo. Não usamos dados
+                    sintéticos para classificar colaboradores.</p>
+                <label class="agente-check"><input id="use-assessment" type="checkbox"> Incluir estas notas reais na
+                    análise para recomendação</label>
+                <form id="scores">
+                    <div class="agente-notas">
+                        <div class="ctl"><label for="fundamentos">Fundamentos (0 a 100)</label><input id="fundamentos"
+                                type="number" min="0" max="100" step="any" required></div>
+                        <div class="ctl"><label for="verificacao">Verificação de respostas (0 a 100)</label><input
+                                id="verificacao" type="number" min="0" max="100" step="any" required></div>
+                        <div class="ctl"><label for="aplicacao">Aplicação prática (0 a 100)</label><input id="aplicacao"
+                                type="number" min="0" max="100" step="any" required></div>
+                    </div>
+                    <div class="agente-acoes">
+                        <button type="submit">Consultar classificação</button>
+                    </div>
+                </form>
+                <div id="prediction" class="agent-output agente-saida"></div>
+            </div>
+        </details>
+    </section>
+
+    <section class="panel agente-painel" aria-labelledby="h-preparacao">
+        <div class="section-heading">
+            <div class="agente-cab">
+                <span class="eyebrow">Administração do agente</span>
+                <h2 id="h-preparacao">Preparação e acompanhamento</h2>
+            </div>
+            <div class="agente-acoes">
+                <button id="index" class="secondary-button">Indexar catálogo</button>
+                <button id="train" class="secondary-button">Treinar modelo de ML</button>
+            </div>
+        </div>
+        <p class="note">Indexe o catálogo antes da primeira recomendação e após alterações nos critérios. O treinamento
+            é assíncrono (RabbitMQ) e usa o arquivo assessment_labels.csv da base.</p>
+        <h3>Processamentos</h3>
+        <ul id="jobs" class="agente-jobs"></ul>
+        <details class="agente-details">
+            <summary>Catálogo e critérios de indicação</summary>
+            <div id="catalog" class="agente-catalogo"></div>
+        </details>
+    </section>
+</main>
+<script src="auth.js"></script>
+<script src="agente.js"></script>
+</body>
+</html>

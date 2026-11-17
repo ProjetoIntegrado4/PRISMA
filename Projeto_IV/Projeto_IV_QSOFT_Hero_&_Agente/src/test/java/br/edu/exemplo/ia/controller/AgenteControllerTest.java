@@ -1,6 +1,13 @@
 package br.edu.exemplo.ia.controller;
 
+import br.edu.exemplo.ia.recommendation.application.RecommendCoursesUseCase;
+import br.edu.exemplo.ia.recommendation.domain.AgenteIndisponivelException;
+import br.edu.exemplo.ia.recommendation.infrastructure.AiServiceClient;
+import br.edu.exemplo.ia.recommendation.infrastructure.OpenAiChave;
 import br.edu.exemplo.ia.service.SecurityConfig;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
@@ -20,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AgenteController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, AiServiceClient.class, OpenAiChave.class})
 class AgenteControllerTest {
     static HttpServer server;
     static {
@@ -45,6 +52,7 @@ class AgenteControllerTest {
     }
     @AfterAll static void stop() { server.stop(0); }
     @Autowired MockMvc mvc;
+    @MockitoBean RecommendCoursesUseCase useCase;
 
     @Test void anonymousDenied() throws Exception { mvc.perform(get("/api/agente/options")).andExpect(status().isUnauthorized()); }
     @Test @WithMockUser void nonAdminDenied() throws Exception { mvc.perform(get("/api/agente/options")).andExpect(status().isForbidden()); }
@@ -57,22 +65,35 @@ class AgenteControllerTest {
         mvc.perform(get("/api/agente/jobs/00000000-0000-0000-0000-000000000001")).andExpect(status().isOk());
     }
     @Test @WithMockUser(roles="ADMIN") void forwardsActions() throws Exception {
-        for (String path : new String[]{"profile", "recommend", "predict"}) {
+        for (String path : new String[]{"profile", "predict"}) {
             mvc.perform(post("/api/agente/" + path).with(csrf()).contentType(MediaType.APPLICATION_JSON).content("{}"))
                     .andExpect(status().isOk()).andExpect(jsonPath("$.path").value("/" + path));
         }
-        for (String path : new String[]{"training/jobs", "index/jobs", "evaluation/jobs"}) {
-            mvc.perform(post("/api/agente/" + path).with(csrf()).contentType(MediaType.APPLICATION_JSON).content("{}"))
-                    .andExpect(status().isAccepted()).andExpect(jsonPath("$.path").value("/" + path));
-        }
+        mvc.perform(post("/api/agente/training/jobs").with(csrf()).contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isAccepted()).andExpect(jsonPath("$.path").value("/training/jobs"));
+    }
+    @Test @WithMockUser(roles="ADMIN") void recommendRunsInSpring() throws Exception {
+        var mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        when(useCase.recommend(any())).thenReturn((com.fasterxml.jackson.databind.node.ObjectNode) mapper.readTree("{\"status\":\"generated\"}"));
+        mvc.perform(post("/api/agente/recommend").with(csrf()).contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("generated"));
+    }
+    @Test @WithMockUser(roles="ADMIN") void openAiFailureIsSafe503() throws Exception {
+        when(useCase.recommend(any())).thenThrow(new AgenteIndisponivelException("Configure OPENAI_API_KEY no arquivo .env e reinicie o backend."));
+        mvc.perform(post("/api/agente/recommend").with(csrf()).contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isServiceUnavailable()).andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("OPENAI_API_KEY")));
+    }
+    @Test @WithMockUser(roles="ADMIN") void healthReportsKeyWithoutValue() throws Exception {
+        mvc.perform(get("/api/agente/health")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.openai_configured").value(false)).andExpect(jsonPath("$.provider").value("openai"));
     }
     @Test void missingTokenFailsClosed() {
-        var controller = new AgenteController("http://127.0.0.1:1", "", new com.fasterxml.jackson.databind.ObjectMapper());
-        assertEquals(503, controller.health().getStatusCode().value());
+        var client = new AiServiceClient("http://127.0.0.1:1", "", new com.fasterxml.jackson.databind.ObjectMapper());
+        assertEquals(503, client.get("/health").getStatusCode().value());
     }
     @Test void connectionFailureIsSanitized() {
-        var controller = new AgenteController("http://127.0.0.1:1", "private-token", new com.fasterxml.jackson.databind.ObjectMapper());
-        var response = controller.health();
+        var client = new AiServiceClient("http://127.0.0.1:1", "private-token", new com.fasterxml.jackson.databind.ObjectMapper());
+        var response = client.get("/health");
         assertEquals(503, response.getStatusCode().value());
         org.junit.jupiter.api.Assertions.assertFalse(response.getBody().toString().contains("private-token"));
     }

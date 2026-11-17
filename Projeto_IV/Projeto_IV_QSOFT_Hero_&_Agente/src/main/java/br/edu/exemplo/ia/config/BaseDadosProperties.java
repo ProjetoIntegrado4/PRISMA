@@ -12,5 +12,5 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
  * @param dir pasta que contém companies.csv, employees.csv, departments.csv e admins.csv
  */
 @ConfigurationProperties(prefix = "prisma.dados")
-public record BaseDadosProperties(@DefaultValue("dados/csv") String dir) {
+public record BaseDadosProperties(@DefaultValue("dados/csv_preenchidos") String dir) {
 }

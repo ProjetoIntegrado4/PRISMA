@@ -4,9 +4,9 @@ from openai import AuthenticationError, PermissionDeniedError, RateLimitError, A
 def public_error(error):
     import httpx
     if isinstance(error, httpx.TimeoutException):
-        return "O modelo local excedeu o tempo disponível. Aguarde o processamento e tente novamente."
+        return "O serviço excedeu o tempo disponível. Tente novamente."
     if isinstance(error, (httpx.HTTPError,)):
-        return "Ollama indisponível ou modelo local não preparado. Verifique o serviço e os modelos baixados."
+        return "Serviço externo indisponível. Verifique a conexão e tente novamente."
     if isinstance(error, AuthenticationError):
         return "A OpenAI recusou a chave configurada. Verifique se está ativa e correta."
     if isinstance(error, PermissionDeniedError):

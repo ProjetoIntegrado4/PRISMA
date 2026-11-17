@@ -15,10 +15,10 @@ FEATURES = ["fundamentos", "verificacao", "aplicacao"]
 LABELS = ["iniciante", "intermediario", "avancado"]
 
 
-def train():
+def train(job_id="manual", seed=42):
     path = Path(os.getenv("PRISMA_DADOS_DIR", "/data")) / "assessment_labels.csv"
     if not path.exists():
-        raise ValueError("Falta assessment_labels.csv com avaliações e níveis rotulados por avaliador humano. Consulte docs/AGENTE.md.")
+        raise ValueError("Falta assessment_labels.csv com avaliações e níveis rotulados. Consulte docs/AGENTE_GABARITO_A4.md.")
     with path.open(encoding="utf-8-sig", newline="") as stream:
         records = list(csv.DictReader(stream))
     if len(records) < 30:
@@ -35,13 +35,13 @@ def train():
     y = np.array([r["label"] for r in records])
     if any(sum(y == label) < 10 for label in LABELS):
         raise ValueError("São necessárias ao menos 10 avaliações por nível.")
-    train_x, test_x, train_y, test_y = train_test_split(x, y, test_size=0.25, random_state=42, stratify=y)
+    train_x, test_x, train_y, test_y = train_test_split(x, y, test_size=0.25, random_state=seed, stratify=y)
     scaler = StandardScaler().fit(train_x)
-    model = LogisticRegression(max_iter=1000, random_state=42).fit(scaler.transform(train_x), train_y)
+    model = LogisticRegression(max_iter=1000, random_state=seed).fit(scaler.transform(train_x), train_y)
     predicted = model.predict(scaler.transform(test_x))
     artifact = {"features": FEATURES, "classes": model.classes_.tolist(), "mean": scaler.mean_.tolist(),
                 "scale": scaler.scale_.tolist(), "coef": model.coef_.tolist(), "intercept": model.intercept_.tolist(),
-                "source": "human_labeled_assessments", "train_samples": len(train_y), "test_samples": len(test_y),
+                "source": path.name, "job_id": job_id, "seed": seed, "train_samples": len(train_y), "test_samples": len(test_y),
                 "metrics": {"accuracy": accuracy_score(test_y, predicted), "f1_macro": f1_score(test_y, predicted, average="macro"),
                             "confusion_matrix": confusion_matrix(test_y, predicted, labels=model.classes_).tolist()},
                 "limitations": "Métricas de uma divisão estratificada interna; não são validação externa nem diagnóstico."}

@@ -66,13 +66,23 @@ services:
       # Dentro do contêiner a base de dados fica sempre em /app/dados; a pasta real do computador
       # vem do PRISMA_DADOS_DIR do arquivo .env (veja o volume abaixo).
       PRISMA_DADOS_DIR: /app/dados
+      # Agente de IA (agente.html). Ficam aqui também, e não só no compose.ai.yml, para que recriar só o
+      # backend (docker compose up -d --force-recreate backend) não apague a ligação com o serviço de IA.
+      AI_SERVICE_URL: ${AI_SERVICE_URL:-http://ai-service:8000}
+      AI_INTERNAL_TOKEN: ${AI_INTERNAL_TOKEN:-}
+      RAGAS_SERVICE_URL: ${RAGAS_SERVICE_URL:-http://ragas-service:8001}
+      AI_VECTOR_DB_URL: ${AI_VECTOR_DB_URL:-jdbc:postgresql://ai-db:5432/qai_ai}
+      AI_DB_PASSWORD: ${AI_DB_PASSWORD:-}
+      # Chave da OpenAI (Spring AI): só no arquivo .env, nunca no código.
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
     ports:
       - "8080:8080"
     volumes:
       # Base de dados em CSV (cadastros e painel). Leitura e escrita: o que for cadastrado no site
       # é gravado nos CSVs, e o que for acrescentado nos CSVs aparece no site.
       - type: bind
-        source: ${PRISMA_DADOS_DIR:-./dados/csv}
+        source: ${PRISMA_DADOS_DIR:-./dados/csv_preenchidos}
         target: /app/dados
     depends_on:
       - postgres

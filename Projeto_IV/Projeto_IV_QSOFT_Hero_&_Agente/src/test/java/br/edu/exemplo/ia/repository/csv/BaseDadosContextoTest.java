@@ -37,6 +37,6 @@ class BaseDadosContextoTest {
     void semConfiguracaoUsaAPastaPadrao() {
         new ApplicationContextRunner()
                 .withUserConfiguration(BaseDadosConfig.class, BaseDadosCsv.class)
-                .run(ctx -> assertEquals(Path.of("dados/csv"), ctx.getBean(BaseDadosCsv.class).pasta()));
+                .run(ctx -> assertEquals(Path.of("dados/csv_preenchidos"), ctx.getBean(BaseDadosCsv.class).pasta()));
     }
 }
