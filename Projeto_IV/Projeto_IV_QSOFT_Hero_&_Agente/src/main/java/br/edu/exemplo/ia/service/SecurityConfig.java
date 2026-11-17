@@ -61,6 +61,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/funcionario").hasAnyRole(GESTAO)
                         .requestMatchers(HttpMethod.PUT, "/api/funcionario/**").hasAnyRole(GESTAO)
                         .requestMatchers(HttpMethod.DELETE, "/api/funcionario/**").hasAnyRole(GESTAO)
+                        .requestMatchers("/api/agente/**").hasAnyRole(GESTAO)
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint((request, response, exception) -> {
                     response.setStatus(401);
@@ -134,4 +135,4 @@ public class SecurityConfig {
         repository.setCookiePath("/");
         return repository;
     }
-}
+}

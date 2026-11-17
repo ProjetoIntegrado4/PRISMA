@@ -6,7 +6,7 @@ const API = process.env.API_BASE_URL || 'http://localhost:8080';
 
 app.use(express.json());
 
-const PAGINAS_SO_ADMIN = ['/empresa.html', '/admin.html', '/funcionario.html', '/capacitacao.html'];
+const PAGINAS_SO_ADMIN = ['/empresa.html', '/admin.html', '/funcionario.html', '/capacitacao.html', '/agente.html'];
 const PERFIS_GESTAO = ['ADMIN', 'GERENTE'];
 
 app.use(async (req, res, next) => {

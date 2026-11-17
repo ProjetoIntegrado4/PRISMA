@@ -1,0 +1,15 @@
+services:
+  postgres:
+    container_name: prisma-integrado-postgres
+  pgadmin:
+    container_name: prisma-integrado-pgadmin
+  alert-service:
+    container_name: prisma-integrado-alert
+  backend:
+    container_name: prisma-integrado-backend
+  frontend:
+    container_name: prisma-integrado-frontend
+volumes:
+  ollama_data:
+    external: true
+    name: qaicontrol-agente_ollama_data

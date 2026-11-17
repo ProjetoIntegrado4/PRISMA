@@ -6,7 +6,7 @@
 //   data-somente-administrador  só o administrador (ex.: cadastrar empresa)
 //   data-somente-funcionario    só o funcionário
 // O backend também barra o funcionário nos cadastros; aqui é só para a tela ficar coerente.
-const PAGINAS_SO_ADMIN = ['empresa.html', 'admin.html', 'funcionario.html', 'capacitacao.html'];
+const PAGINAS_SO_ADMIN = ['empresa.html', 'admin.html', 'funcionario.html', 'capacitacao.html', 'agente.html'];
 const PERFIS = ['ADMIN', 'GERENTE', 'FUNCIONARIO'];
 
 window.prismaUsuario = fetch('/api/auth/me', {credentials: 'same-origin'})

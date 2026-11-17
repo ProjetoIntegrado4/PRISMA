@@ -37,3 +37,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+.env
+.env.*
+backup_antes_agente_*/
+**/__pycache__/
+**/.pytest_cache/
